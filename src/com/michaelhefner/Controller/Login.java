@@ -8,11 +8,6 @@ import javafx.scene.control.TextField;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -27,6 +22,19 @@ public class Login implements Initializable {
     log-in and error control messages (e.g., “The username and password did not match.”) into two languages.
 
      */
+    final private String NO_ERROR =
+            "-fx-text-fill: rgba(25, 205, 25, 1);";
+    final private String USER_LOGIN_PATH = "user_login_log.txt";
+    final private String NO_USERNAME = "No_Username_Entered";
+    final private String NO_PASSWORD = "No_Password_Entered";
+    final private String CORRECT_AUTH = "Correct_Password_Entered";
+    final private String INCORRECT_AUTH = "Incorrect_Username_Password_Combination";
+    final private String password = "test";
+    final private String username = "test";
+
+    private StringBuilder writeBuilder;
+    private LocalDateTime dateTime;
+
     @FXML
     private Label lblError;
     @FXML
@@ -35,30 +43,37 @@ public class Login implements Initializable {
     @FXML
     private TextField txtUsername;
 
+    private void addMessage(String message){
+        writeBuilder.append(" message=" + message + " ");
+    }
     @FXML
     private void onLoginClicked() {
-        StringBuilder writeBuilder = new StringBuilder();
-        LocalDateTime date = LocalDateTime.now();
-        String password = "test";
-        String username = "test";
-        writeBuilder.append(date);
+        writeBuilder = new StringBuilder();
+        dateTime = LocalDateTime.now();
+
+
+        writeBuilder.append(dateTime);
         if (txtUsername.getText().isEmpty()) {
-            writeBuilder.append(" No_Username_Entered ");
+            addMessage(NO_USERNAME);
             lblError.setText("No username entered.");
-        } else if (txtPassword.getText().isEmpty()) {
-            writeBuilder.append(" No_Password_Entered ");
-            lblError.setText("No password entered.");
-        } else if ((txtPassword.getText().compareTo(password) != 0)
-                && (txtUsername.getText().compareTo(username) != 0)) {
-            writeBuilder.append(" Incorrect_Password_Entered ");
-            lblError.setText("Incorrect username and password entered.");
-        } else {
-            writeBuilder.append(" Correct_Password_Entered");
         }
-        writeBuilder.append(txtUsername.getText());
+        if (txtPassword.getText().isEmpty()) {
+            addMessage(NO_PASSWORD);
+            lblError.setText("No password entered.");
+        }
+        if ((txtPassword.getText().compareTo(password) == 0)
+                && (txtUsername.getText().compareTo(username) == 0)) {
+            addMessage(CORRECT_AUTH);
+            lblError.setText("Success");
+            lblError.setStyle(NO_ERROR);
+        } else {
+            addMessage(INCORRECT_AUTH);
+            lblError.setText("Incorrect username and password entered.");
+        }
+        writeBuilder.append("username=" + txtUsername.getText());
 
         ArrayList<String> readList = new ArrayList<>();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("user_log.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(USER_LOGIN_PATH))) {
             String line = bufferedReader.readLine();
             while (line != null) {
                 readList.add(line);
@@ -67,7 +82,7 @@ public class Login implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("user_log.txt"))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(USER_LOGIN_PATH))) {
             for (String line : readList) {
                 bufferedWriter.append(line);
                 bufferedWriter.newLine();

@@ -1,0 +1,9 @@
+2020-04-07T16:50:08.637383700 Incorrect_Password_Entered none
+2020-04-07T16:51:26.838033200 Incorrect_Password_Entered username=testing
+2020-04-07T16:54:30.381575600 message=Incorrect_Password_Entered username=one
+2020-04-07T16:54:34.986544 message=No_Username_Entered username=
+2020-04-07T16:54:38.175095700 message=No_Username_Entered username=
+2020-04-07T16:57:17.761466800 message=No_Username_Entered  message=No_Password_Entered  message=Incorrect_Password_Entered username=
+2020-04-07T17:01:24.532756300 message=Incorrect_Username_Password_Combination username=testing
+2020-04-07T17:01:38.248296500 message=Incorrect_Username_Password_Combination username=test
+2020-04-07T17:01:45.036613400 message=Correct_Password_Entered username=test
