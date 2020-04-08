@@ -1,24 +1,24 @@
 package com.michaelhefner.Model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-public class Customer extends SQLEntry {
+public class Customer {
+    private int id;
     private String name;
     private int addressId;
     private int active;
 
-
-
-    public Customer(int id, LocalDate createDate, String createdBy, LocalDateTime lastUpdate,
-                    String lastUpdateBy, String name, int addressId, int active) {
-        super(id, createDate, createdBy, lastUpdate, lastUpdateBy);
+    public Customer(String name, int addressId, int active) {
         setActive(active);
         setAddressId(addressId);
         setName(name);
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

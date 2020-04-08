@@ -1,24 +1,28 @@
 package com.michaelhefner.Model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+public class Address {
+    private int id;
 
-public class Address extends SQLEntry {
     private String address;
     private String address2;
     private int cityId;
     private String postalCode;
     private String phone;
 
-
-    public Address(int id, LocalDate createDate, String createdBy, LocalDateTime lastUpdate,
-                   String lastUpdateBy, String address, String address2, int cityId, String postalCode, String phone) {
-        super(id, createDate, createdBy, lastUpdate, lastUpdateBy);
+    public Address(String address, String address2, int cityId, String postalCode, String phone) {
         setAddress(address);
         setAddress2(address2);
         setCityId(cityId);
         setPhone(phone);
         setPostalCode(postalCode);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getAddress() {

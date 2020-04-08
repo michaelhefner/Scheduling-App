@@ -1,11 +1,23 @@
 package com.michaelhefner.Model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-public class City extends SQLEntry {
+public class City {
+    private int id;
     private String city;
     private int countryId;
+
+    public City(String city, int countryId) {
+        setId(id);
+        setCity(city);
+        setCountryId(countryId);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getCity() {
         return city;
@@ -23,10 +35,5 @@ public class City extends SQLEntry {
         this.countryId = countryId;
     }
 
-    public City(int id, LocalDate createDate, String createdBy,
-                LocalDateTime lastUpdate, String lastUpdateBy, String city, int countryId) {
-        super(id, createDate, createdBy, lastUpdate, lastUpdateBy);
-        setCity(city);
-        setCountryId(countryId);
-    }
+
 }

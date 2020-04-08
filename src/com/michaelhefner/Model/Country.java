@@ -1,21 +1,27 @@
 package com.michaelhefner.Model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-public class Country extends SQLEntry {
+public class Country {
+    private int id;
     private String country;
+
+    public Country(String country) {
+        setCountry(country);
+    }
 
     public String getCountry() {
         return country;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setCountry(String country) {
         this.country = country;
     }
 
-    public Country(int id, LocalDate createDate, String createdBy, LocalDateTime lastUpdate, String lastUpdateBy, String country) {
-        super(id, createDate, createdBy, lastUpdate, lastUpdateBy);
-        setCountry(country);
-    }
 }

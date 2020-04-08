@@ -1,9 +1,9 @@
 package com.michaelhefner.Model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class Appointment extends SQLEntry {
+public class Appointment {
+    private int id;
     private int customerId;
     private int userId;
     private String title;
@@ -16,10 +16,8 @@ public class Appointment extends SQLEntry {
     private LocalDateTime end;
 
 
-    public Appointment(int id, LocalDate createDate, String createdBy, LocalDateTime lastUpdate, String lastUpdateBy,
-                       int customerId, int userId, String title, String description, String location, String contact,
-                       String type, String url) {
-        super(id, createDate, createdBy, lastUpdate, lastUpdateBy);
+    public Appointment(int customerId, int userId, String title, String description, String location, String contact,
+                       String type, String url, LocalDateTime start, LocalDateTime end) {
         setCustomerId(customerId);
         setUserId(userId);
         setTitle(title);
@@ -28,7 +26,18 @@ public class Appointment extends SQLEntry {
         setContact(contact);
         setType(type);
         setUrl(url);
+        setStart(start);
+        setEnd(end);
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 
     public int getCustomerId() {
         return customerId;

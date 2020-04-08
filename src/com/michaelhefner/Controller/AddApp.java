@@ -1,4 +1,4 @@
 package com.michaelhefner.Controller;
 
-public class Controller {
+public class AddApp {
 }
