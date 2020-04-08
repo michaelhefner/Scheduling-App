@@ -1,6 +1,8 @@
 package com.michaelhefner.Controller;
 
 import com.michaelhefner.Model.*;
+import com.michaelhefner.Model.DB.Connect;
+import com.michaelhefner.Model.DB.Query;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -54,23 +56,108 @@ public class AddCust implements Initializable {
     }
 
     @FXML
-    public void onSaveClicked() {
+    public void onSaveClicked() throws SQLException {
+        if (txtAddress2.getText().isEmpty())
+            txtAddress2.setText("none");
         boolean isValid = checkForEmptyField(new TextField[]{
                 txtAddress, txtAddress2, txtCity, txtCountry, txtName, txtPhone, txtPhone, txtPostalCode});
         if (isValid){
-            Country country = new Country(txtCountry.getText());
-            City city = new City(txtCity.getText(), country.getId());
-            Address address = new Address(txtAddress.getText(), txtAddress2.getText(), city.getId(), txtPostalCode.getText(), txtPhone.getText());
-            Customer customer = new Customer(txtName.getText(), address.getId(), 1);
+            Country country = addCountryToDB();
+            City city = (country.getId() > 0 ? addCityToDB(country.getId()) : null);
+            Address address = (city.getId() > 0 ? addAddressToDB(city.getId()) : null);
+            Customer customer = (address.getId() > 0 ? addCustomerToDB(address.getId()) : null);
 
-            JDBCEntries.addCustomer(customer);
+            if (customer.getId() > 0) {
+                Connect.closeConnection();
+                JDBCEntries.addCustomer(customer);
+                closeWindow();
+            } else {
+                showAlert("Error", "There was an error uploading information to database",
+                        "Select OK to retry");
+            }
 
-            closeWindow(true);
         }
     }
 
+    public Customer addCustomerToDB(int addressId) throws SQLException {
+        Customer customer = new Customer(txtName.getText(), addressId, 1);
+        Statement statement = Query.getStatement();
+        statement.executeUpdate("INSERT INTO customer(customerName, addressId, active, " +
+                "createDate, createdBy, lastUpdateBy) values('" + customer.getName() + "', " +
+                addressId + ", " + customer.getActive()  + ", NOW(), '" + User.getName() +
+                "', '" + User.getName() + "')");
+
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM customer");
+        int customerId = 0;
+        while (resultSet.next())
+            if(resultSet.last())
+                customerId = Integer.parseInt(resultSet.getString("customerId"));
+        if (customerId > 0)
+            customer.setId(customerId);
+        else
+            Connect.closeConnection();
+        return customer;
+    }
+
+    public Address addAddressToDB(int cityId) throws SQLException {
+        Address address = new Address(txtAddress.getText(), txtAddress2.getText(), cityId, txtPostalCode.getText(), txtPhone.getText());
+        Statement statement = Query.getStatement();
+        statement.executeUpdate("INSERT INTO address(address, address2, cityId, postalCode, phone, " +
+                "createDate, createdBy, lastUpdateBy) values('" + address.getAddress() + "', '" +
+                address.getAddress2() + "', " + cityId + ", '" + address.getPostalCode() + "', '" +
+                address.getPhone() + "', NOW(), '" + User.getName() + "', '" + User.getName() + "')");
+
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM address");
+        int addressId = 0;
+        while (resultSet.next())
+            if(resultSet.last())
+                addressId = Integer.parseInt(resultSet.getString("addressId"));
+        if (addressId > 0)
+            address.setId(addressId);
+        else
+            Connect.closeConnection();
+        return address;
+    }
+
+    public City addCityToDB(int countryId) throws SQLException {
+        City city = new City(txtCity.getText(), countryId);
+        Statement statement = Query.getStatement();
+        statement.executeUpdate("INSERT INTO city(city, countryId, createDate, createdBy, lastUpdateBy)" +
+                        " values('" + txtCity.getText() + "', " + countryId + ", NOW(), '"
+                + User.getName() + "', '" + User.getName() + "')");
+
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM city");
+        int cityId = 0;
+        while (resultSet.next())
+            if(resultSet.last())
+                cityId = Integer.parseInt(resultSet.getString("cityId"));
+        if (cityId > 0)
+            city.setId(cityId);
+        else
+            Connect.closeConnection();
+        return city;
+    }
+
+    public Country addCountryToDB() throws SQLException {
+        Country country = new Country(txtCountry.getText());
+        Query.setStatement(Connect.getConnection());
+        Statement statement = Query.getStatement();
+        statement.executeUpdate("INSERT INTO country(country, createDate, createdBy, lastUpdateBy)" +
+                        " values('" + txtCountry.getText() + "', NOW(), '" + User.getName() + "', '" + User.getName() + "')");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM country");
+        int countryId = 0;
+        while (resultSet.next())
+            if(resultSet.last())
+                countryId = Integer.parseInt(resultSet.getString("countryId"));
+        if (countryId > 0)
+            country.setId(countryId);
+        else
+            Connect.closeConnection();
+        return country;
+    }
+
     @FXML
-    public void closeWindow(boolean bypass) {
+    public void closeWindow() {
         if (showAlert("Cancel","You are about to close this window","Select OK to proceed")) {
             close();
         }
@@ -81,18 +168,15 @@ public class AddCust implements Initializable {
         stage.close();
     }
 
-
     private Boolean showAlert(String title, String header, String context){
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(context);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            return true;
-        }
-        return false;
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
+
     private boolean checkForEmptyField(TextField[] textFields) {
         boolean isValid = true;
         for (TextField field : textFields) {
@@ -108,27 +192,4 @@ public class AddCust implements Initializable {
         return isValid;
     }
 
-    private boolean addCustomerInDB(Country country, City city, Address address, Customer customer){
-
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://3.227.166.251/U05yp2", "U05yp2", "53688646210");
-            Statement statement = connection.createStatement();
-            LocalDateTime localDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-            String dateTime = formatter.format(localDateTime);
-
-            statement.executeUpdate(
-                    "insert into country values(0, '" + country.getCountry() + "', '" + dateTime + "', '" + User.getName() + "', CONVERT(NOW(), CHAR), 'bobo')");
-
-            ResultSet rs = statement.executeQuery("select * from country");
-            while (rs.next()) {
-                System.out.println(rs.getString("createDate"));
-            }
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
 }

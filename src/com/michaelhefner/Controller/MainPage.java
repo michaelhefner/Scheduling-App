@@ -54,23 +54,23 @@ public class MainPage implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        try {
-            Statement statement = Connect.getConnection().createStatement();
-            initializeDB(statement);
-            LocalDateTime localDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-            String dateTime = formatter.format(localDateTime);
-            statement.executeUpdate(
-                    "insert into country values(0, 'Deer', '" + dateTime + "', 'bob', CONVERT(NOW(), CHAR), 'bobo')");
-
-            ResultSet rs = statement.executeQuery("select * from country");
-            while (rs.next()) {
-                System.out.println(rs.getString("createDate"));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Statement statement = Connect.getConnection().createStatement();
+////            initializeDB(statement);
+//            LocalDateTime localDateTime = LocalDateTime.now();
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+//            String dateTime = formatter.format(localDateTime);
+//            statement.executeUpdate(
+//                    "insert into country values(0, 'Deer', '" + dateTime + "', 'bob', CONVERT(NOW(), CHAR), 'bobo')");
+//
+//            ResultSet rs = statement.executeQuery("select * from country");
+//            while (rs.next()) {
+//                System.out.println(rs.getString("createDate"));
+//            }
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
         /*
          * Start Demo Data
@@ -156,7 +156,6 @@ public class MainPage implements Initializable {
         openStage("../View/AddApp.fxml");
     }
 
-
     @FXML
     public void deleteCust() {
 
@@ -175,75 +174,75 @@ public class MainPage implements Initializable {
     @FXML
     public void handleSearchApp() {
     }
-
-
-    private void initializeDB(Statement statement) {
-
-        try {
-            statement.executeUpdate("CREATE TABLE country ("
-                    + "countryId INT(10), "
-                    + "country VARCHAR(50), "
-                    + "createDate DATETIME, "
-                    + "createBy VARCHAR(40), "
-                    + "lastUpdate TIMESTAMP, "
-                    + "lastUpdateBy VARCHAR(40))");
-            statement.executeUpdate("CREATE TABLE city ("
-                    + "cityId INT(10), "
-                    + "city VARCHAR(50), "
-                    + "countryId INT(10), "
-                    + "createDate DATETIME, "
-                    + "createBy VARCHAR(40), "
-                    + "lastUpdate TIMESTAMP, "
-                    + "lastUpdateBy VARCHAR(40))");
-            statement.executeUpdate("CREATE TABLE address ("
-                    + "addressId INT(10), "
-                    + "address VARCHAR(50), "
-                    + "address2 VARCHAR(50), "
-                    + "cityId INT(10), "
-                    + "postalCode VARCHAR(10), "
-                    + "phone VARCHAR(20), "
-                    + "createDate DATETIME, "
-                    + "createBy VARCHAR(40), "
-                    + "lastUpdate TIMESTAMP, "
-                    + "lastUpdateBy VARCHAR(40))");
-            statement.executeUpdate("CREATE TABLE customer ("
-                    + "customerId INT(10), "
-                    + "customerName VARCHAR(45), "
-                    + "addressId INT(10), "
-                    + "active TINYINT(1), "
-                    + "createDate DATETIME, "
-                    + "createBy VARCHAR(40), "
-                    + "lastUpdate TIMESTAMP, "
-                    + "lastUpdateBy VARCHAR(40))");
-            statement.executeUpdate("CREATE TABLE appointment ("
-                    + "appointmentId INT(10), "
-                    + "customerId INT(10), "
-                    + "userId INT(10), "
-                    + "title VARCHAR(255), "
-                    + "description TEXT, "
-                    + "location TEXT, "
-                    + "contact TEXT, "
-                    + "type TEXT, "
-                    + "url VARCHAR(255), "
-                    + "createDate DATETIME, "
-                    + "createBy VARCHAR(40), "
-                    + "lastUpdate TIMESTAMP, "
-                    + "lastUpdateBy VARCHAR(40))");
-            statement.executeUpdate("CREATE TABLE user ("
-                    + "userId INT, "
-                    + "userName VARCHAR(50), "
-                    + "password VARCHAR(50), "
-                    + "active TINYINT(1), "
-                    + "createDate DATETIME, "
-                    + "createBy VARCHAR(40), "
-                    + "lastUpdate TIMESTAMP, "
-                    + "lastUpdateBy VARCHAR(40))");
-        } catch (SQLException e) {
-            System.out.println("Table Already Created");
-//            e.printStackTrace();
-        }
-
-    }
+//
+//
+//    private void initializeDB(Statement statement) {
+//
+//        try {
+//            statement.executeUpdate("CREATE TABLE country ("
+//                    + "countryId INT(10), "
+//                    + "country VARCHAR(50), "
+//                    + "createDate DATETIME, "
+//                    + "createBy VARCHAR(40), "
+//                    + "lastUpdate TIMESTAMP, "
+//                    + "lastUpdateBy VARCHAR(40))");
+//            statement.executeUpdate("CREATE TABLE city ("
+//                    + "cityId INT(10), "
+//                    + "city VARCHAR(50), "
+//                    + "countryId INT(10), "
+//                    + "createDate DATETIME, "
+//                    + "createBy VARCHAR(40), "
+//                    + "lastUpdate TIMESTAMP, "
+//                    + "lastUpdateBy VARCHAR(40))");
+//            statement.executeUpdate("CREATE TABLE address ("
+//                    + "addressId INT(10), "
+//                    + "address VARCHAR(50), "
+//                    + "address2 VARCHAR(50), "
+//                    + "cityId INT(10), "
+//                    + "postalCode VARCHAR(10), "
+//                    + "phone VARCHAR(20), "
+//                    + "createDate DATETIME, "
+//                    + "createBy VARCHAR(40), "
+//                    + "lastUpdate TIMESTAMP, "
+//                    + "lastUpdateBy VARCHAR(40))");
+//            statement.executeUpdate("CREATE TABLE customer ("
+//                    + "customerId INT(10), "
+//                    + "customerName VARCHAR(45), "
+//                    + "addressId INT(10), "
+//                    + "active TINYINT(1), "
+//                    + "createDate DATETIME, "
+//                    + "createBy VARCHAR(40), "
+//                    + "lastUpdate TIMESTAMP, "
+//                    + "lastUpdateBy VARCHAR(40))");
+//            statement.executeUpdate("CREATE TABLE appointment ("
+//                    + "appointmentId INT(10), "
+//                    + "customerId INT(10), "
+//                    + "userId INT(10), "
+//                    + "title VARCHAR(255), "
+//                    + "description TEXT, "
+//                    + "location TEXT, "
+//                    + "contact TEXT, "
+//                    + "type TEXT, "
+//                    + "url VARCHAR(255), "
+//                    + "createDate DATETIME, "
+//                    + "createBy VARCHAR(40), "
+//                    + "lastUpdate TIMESTAMP, "
+//                    + "lastUpdateBy VARCHAR(40))");
+//            statement.executeUpdate("CREATE TABLE user ("
+//                    + "userId INT, "
+//                    + "userName VARCHAR(50), "
+//                    + "password VARCHAR(50), "
+//                    + "active TINYINT(1), "
+//                    + "createDate DATETIME, "
+//                    + "createBy VARCHAR(40), "
+//                    + "lastUpdate TIMESTAMP, "
+//                    + "lastUpdateBy VARCHAR(40))");
+//        } catch (SQLException e) {
+//            System.out.println("Table Already Created");
+////            e.printStackTrace();
+//        }
+//
+//    }
 
     private void openStage(String stagePath) {
         Parent root = null;
@@ -256,6 +255,4 @@ public class MainPage implements Initializable {
             e.printStackTrace();
         }
     }
-
-
 }

@@ -22,22 +22,22 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        Connection connection = Connect.getConnection();
-        try {
-            Query.setStatement(connection);
-            Statement statement = Query.getStatement();
-
-            String insert = "INSERT INTO country(country, createDate, createdBy, lastUpdateBy) values('US', '2020-04-08 00:00:00.0', 'Michael', 'Michael')";
-            statement.execute(insert);
-            if (statement.getUpdateCount() > 0)
-                System.out.println("Insert executed successfully. With " + statement.getUpdateCount() + " rows effected.");
-            else
-                System.out.println("No change detected to the database.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        Connection connection = Connect.getConnection();
+//        try {
+//            Query.setStatement(connection);
+//            Statement statement = Query.getStatement();
+//
+//            String insert = "INSERT INTO country(country, createDate, createdBy, lastUpdateBy) values('US', '2020-04-08 00:00:00.0', 'Michael', 'Michael')";
+//            statement.execute(insert);
+//            if (statement.getUpdateCount() > 0)
+//                System.out.println("Insert executed successfully. With " + statement.getUpdateCount() + " rows effected.");
+//            else
+//                System.out.println("No change detected to the database.");
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
         launch(args);
-        Connect.closeConnection();
+//        Connect.closeConnection();
     }
 }

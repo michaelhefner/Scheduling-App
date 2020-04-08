@@ -1,8 +1,6 @@
 package com.michaelhefner.Model.DB;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class Connect {
     private static final String protocol = "jdbc";

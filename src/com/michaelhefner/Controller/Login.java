@@ -22,6 +22,14 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Login implements Initializable {
+    private final String USER_LOGIN_PATH = "user_login_log.txt";
+    private final String NO_USER_FOUND = "No user found by that name";
+    private final String NO_PASSWORD = "No password entered.";
+    private final String NO_USERNAME = "No username entered.";
+    private final String CORRECT_AUTH = "Success";
+    private final String NO_ERROR = "-fx-text-fill: rgba(25, 205, 25, 1);";
+    private final String INCORRECT_AUTH = "Incorrect username and password entered.";
+
     private StringBuilder writeBuilder;
 
     @FXML
@@ -42,12 +50,10 @@ public class Login implements Initializable {
         LocalDateTime dateTime = LocalDateTime.now();
         writeBuilder.append(dateTime);
         if (txtUsername.getText().isEmpty()) {
-            String NO_USERNAME = "No username entered.";
             addMessage(NO_USERNAME);
             lblError.setText(NO_USERNAME);
         } else {
             if (txtPassword.getText().isEmpty()) {
-                String NO_PASSWORD = "No password entered.";
                 addMessage(NO_PASSWORD);
                 lblError.setText(NO_PASSWORD);
             } else {
@@ -65,7 +71,6 @@ public class Login implements Initializable {
         writeBuilder.append("username=").append(txtUsername.getText());
         ArrayList<String> readList = new ArrayList<>();
 
-        String USER_LOGIN_PATH = "user_login_log.txt";
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(USER_LOGIN_PATH))) {
             String line = bufferedReader.readLine();
             while (line != null) {
@@ -118,28 +123,15 @@ public class Login implements Initializable {
             System.out.println("User found");
             String password = resultSet.getString("password");
             if (txtPassword.getText().compareTo(password) == 0) {
-                String CORRECT_AUTH = "Success";
                 addMessage(CORRECT_AUTH);
                 lblError.setText(CORRECT_AUTH);
-                /*
-
-    Username = test
-    Password = test
-
-    A.   Create a log-in form that can determine the user’s location and translate
-    log-in and error control messages (e.g., “The username and password did not match.”) into two languages.
-
-     */
-                String NO_ERROR = "-fx-text-fill: rgba(25, 205, 25, 1);";
                 lblError.setStyle(NO_ERROR);
                 isValid = true;
             } else {
-                String INCORRECT_AUTH = "Incorrect username and password entered.";
                 addMessage(INCORRECT_AUTH);
                 lblError.setText(INCORRECT_AUTH);
             }
         } else {
-            String NO_USER_FOUND = "No user found by that name";
             System.out.println(NO_USER_FOUND);
             addMessage(NO_USER_FOUND);
             lblError.setText(NO_USER_FOUND);
@@ -151,7 +143,5 @@ public class Login implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
-
     }
 }

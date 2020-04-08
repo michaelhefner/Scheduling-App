@@ -98,3 +98,18 @@
 2020-04-08T16:23:29.717049500 message=No user found by that name username=one
 2020-04-08T16:23:40.373215200 message=Incorrect username and password entered. username=test
 2020-04-08T16:23:45.841711800 message=Success username=test
+2020-04-08T16:50:03.142730900 message=Success username=test
+2020-04-08T17:26:44.396581100 message=Success username=test
+2020-04-08T17:28:44.406438300 message=Success username=test
+2020-04-08T17:30:11.588386600 message=Success username=test
+2020-04-08T17:32:13.361498900 message=Success username=test
+2020-04-08T17:40:01.518425700 message=Success username=test
+2020-04-08T17:41:33.680725500 message=Success username=test
+2020-04-08T17:42:52.218498800 message=Success username=test
+2020-04-08T17:44:59.296908700 message=Success username=test
+2020-04-08T19:00:09.536035400 message=Success username=test
+2020-04-08T19:02:57.715183200 message=Success username=test
+2020-04-08T19:06:43.392356900 message=Success username=test
+2020-04-08T19:09:16.594316400 message=Success username=test
+2020-04-08T19:11:40.265184500 message=Success username=test
+2020-04-08T19:13:58.805214900 message=Success username=test
