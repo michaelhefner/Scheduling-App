@@ -6,6 +6,22 @@ public class Customer {
     private int addressId;
     private int active;
 
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    private Address address;
+    private City city;
+    private Country country;
+
     public Customer(String name, int addressId, int active) {
         setActive(active);
         setAddressId(addressId);

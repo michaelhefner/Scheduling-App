@@ -1,9 +1,8 @@
 package com.michaelhefner.Controller;
 
-import com.michaelhefner.Model.Appointment;
-import com.michaelhefner.Model.Customer;
+import com.michaelhefner.Model.*;
 import com.michaelhefner.Model.DB.Connect;
-import com.michaelhefner.Model.JDBCEntries;
+import com.michaelhefner.Model.DB.Query;
 import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -20,9 +19,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -35,7 +35,6 @@ public class MainPage implements Initializable {
     private TableColumn<Customer, String> clmCustID;
     @FXML
     private TableColumn<Customer, String> clmCustName;
-
     @FXML
     private TableView<Appointment> tblAppointments;
     @FXML
@@ -53,40 +52,69 @@ public class MainPage implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        ArrayList<Country> countries = new ArrayList<>();
+        ArrayList<City> cities = new ArrayList<>();
+        ArrayList<Address> addresses = new ArrayList<>();
+        ArrayList<Customer> customers = new ArrayList<>();
 
-//        try {
-//            Statement statement = Connect.getConnection().createStatement();
-////            initializeDB(statement);
-//            LocalDateTime localDateTime = LocalDateTime.now();
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-//            String dateTime = formatter.format(localDateTime);
-//            statement.executeUpdate(
-//                    "insert into country values(0, 'Deer', '" + dateTime + "', 'bob', CONVERT(NOW(), CHAR), 'bobo')");
-//
-//            ResultSet rs = statement.executeQuery("select * from country");
-//            while (rs.next()) {
-//                System.out.println(rs.getString("createDate"));
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Query.setStatement(Connect.getConnection());
+            Statement statement = Query.getStatement();
 
-        /*
-         * Start Demo Data
-         */
+            ResultSet customerResultSet = statement.executeQuery("SELECT * FROM customer");
+            while (customerResultSet.next()) {
 
-        Appointment newAppointment = new Appointment(1, 1, "testing title", "test #1",
-                "location", "some contact", "type", "url", LocalDateTime.now(), LocalDateTime.now());
-        JDBCEntries.addAppointment(newAppointment);
+                Customer customer = new Customer(customerResultSet.getString("customerName"),
+                        customerResultSet.getInt("addressId"),
+                        customerResultSet.getInt("active"));
+                customer.setId(customerResultSet.getInt("customerId"));
+                customers.add(customer);
+            }
+            for (Customer c : customers){
+                Statement addressStatement = Query.getStatement();
 
-        Customer newCustomer = new Customer("Bob", 1, 1);
-        newCustomer.setId(1);
-        JDBCEntries.addCustomer(newCustomer);
+                ResultSet addressResultSet =
+                        addressStatement.executeQuery("SELECT * FROM address where addressId = "
+                                + c.getAddressId());
+                addressResultSet.next();
+                Address address = new Address(addressResultSet.getString("address"),
+                        addressResultSet.getString("address2"),
+                        addressResultSet.getInt("cityId"),
+                        addressResultSet.getString("postalCode"),
+                        addressResultSet.getString("phone"));
+                address.setId(addressResultSet.getInt("addressId"));
 
-        /*
-         * End Demo Data
-         */
+                Statement cityStatement = Query.getStatement();
+                ResultSet cityResultSet =
+                        cityStatement.executeQuery("SELECT * FROM city where cityId = "
+                                + address.getCityId());
+                cityResultSet.next();
+                City city = new City(cityResultSet.getString("city"),
+                        cityResultSet.getInt("countryId"));
+                city.setId(cityResultSet.getInt("cityId"));
+
+                Statement countryStatement = Query.getStatement();
+                ResultSet countryResultSet =
+                        countryStatement.executeQuery("SELECT * FROM country where countryId = "
+                                + city.getCountryId());
+                countryResultSet.next();
+                Country country = new Country(countryResultSet.getString("country"));
+                country.setId(countryResultSet.getInt("countryId"));
+
+                c.setCountry(country);
+                c.setAddress(address);
+                c.setCity(city);
+
+                JDBCEntries.addCustomer(c);
+            }
+
+
+
+            Connect.closeConnection();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         clmAppID.setCellValueFactory(new PropertyValueFactory<Appointment, String>("customerId"));
         clmAppTitle.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));

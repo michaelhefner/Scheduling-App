@@ -3,7 +3,6 @@ package com.michaelhefner.Controller;
 import com.michaelhefner.Model.*;
 import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -13,9 +12,9 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -61,7 +60,7 @@ public class AddCust implements Initializable {
             txtAddress2.setText("none");
         boolean isValid = checkForEmptyField(new TextField[]{
                 txtAddress, txtAddress2, txtCity, txtCountry, txtName, txtPhone, txtPhone, txtPostalCode});
-        if (isValid){
+        if (isValid) {
             Country country = addCountryToDB();
             City city = (country.getId() > 0 ? addCityToDB(country.getId()) : null);
             Address address = (city.getId() > 0 ? addAddressToDB(city.getId()) : null);
@@ -84,13 +83,13 @@ public class AddCust implements Initializable {
         Statement statement = Query.getStatement();
         statement.executeUpdate("INSERT INTO customer(customerName, addressId, active, " +
                 "createDate, createdBy, lastUpdateBy) values('" + customer.getName() + "', " +
-                addressId + ", " + customer.getActive()  + ", NOW(), '" + User.getName() +
+                addressId + ", " + customer.getActive() + ", NOW(), '" + User.getName() +
                 "', '" + User.getName() + "')");
 
         ResultSet resultSet = statement.executeQuery("SELECT * FROM customer");
         int customerId = 0;
         while (resultSet.next())
-            if(resultSet.last())
+            if (resultSet.last())
                 customerId = Integer.parseInt(resultSet.getString("customerId"));
         if (customerId > 0)
             customer.setId(customerId);
@@ -110,7 +109,7 @@ public class AddCust implements Initializable {
         ResultSet resultSet = statement.executeQuery("SELECT * FROM address");
         int addressId = 0;
         while (resultSet.next())
-            if(resultSet.last())
+            if (resultSet.last())
                 addressId = Integer.parseInt(resultSet.getString("addressId"));
         if (addressId > 0)
             address.setId(addressId);
@@ -123,13 +122,13 @@ public class AddCust implements Initializable {
         City city = new City(txtCity.getText(), countryId);
         Statement statement = Query.getStatement();
         statement.executeUpdate("INSERT INTO city(city, countryId, createDate, createdBy, lastUpdateBy)" +
-                        " values('" + txtCity.getText() + "', " + countryId + ", NOW(), '"
+                " values('" + txtCity.getText() + "', " + countryId + ", NOW(), '"
                 + User.getName() + "', '" + User.getName() + "')");
 
         ResultSet resultSet = statement.executeQuery("SELECT * FROM city");
         int cityId = 0;
         while (resultSet.next())
-            if(resultSet.last())
+            if (resultSet.last())
                 cityId = Integer.parseInt(resultSet.getString("cityId"));
         if (cityId > 0)
             city.setId(cityId);
@@ -143,11 +142,11 @@ public class AddCust implements Initializable {
         Query.setStatement(Connect.getConnection());
         Statement statement = Query.getStatement();
         statement.executeUpdate("INSERT INTO country(country, createDate, createdBy, lastUpdateBy)" +
-                        " values('" + txtCountry.getText() + "', NOW(), '" + User.getName() + "', '" + User.getName() + "')");
+                " values('" + txtCountry.getText() + "', NOW(), '" + User.getName() + "', '" + User.getName() + "')");
         ResultSet resultSet = statement.executeQuery("SELECT * FROM country");
         int countryId = 0;
         while (resultSet.next())
-            if(resultSet.last())
+            if (resultSet.last())
                 countryId = Integer.parseInt(resultSet.getString("countryId"));
         if (countryId > 0)
             country.setId(countryId);
@@ -158,17 +157,17 @@ public class AddCust implements Initializable {
 
     @FXML
     public void closeWindow() {
-        if (showAlert("Cancel","You are about to close this window","Select OK to proceed")) {
+        if (showAlert("Cancel", "You are about to close this window", "Select OK to proceed")) {
             close();
         }
     }
 
-    private void close(){
+    private void close() {
         Stage stage = (Stage) btnCancel.getScene().getWindow();
         stage.close();
     }
 
-    private Boolean showAlert(String title, String header, String context){
+    private Boolean showAlert(String title, String header, String context) {
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(context);
