@@ -114,7 +114,7 @@
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                     </HBox.margin>
                 </Button>
-                <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#closeWindow" text="Cancel">
+                <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#closeWindowWithAlert" text="Cancel">
                     <font>
                         <Font size="18.0" />
                     </font>

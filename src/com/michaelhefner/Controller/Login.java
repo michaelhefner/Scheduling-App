@@ -24,12 +24,10 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class Login implements Initializable {
-    private final String USER_LOGIN_PATH = "user_login_log.txt";
     private String noUserFound;
     private String noPassword;
     private String noUsername;
     private String correctAuth;
-    private final String NO_ERROR = "-fx-text-fill: rgba(25, 205, 25, 1);";
     private String incorrectAuth;
 
     private StringBuilder writeBuilder;
@@ -73,6 +71,7 @@ public class Login implements Initializable {
         writeBuilder.append("username=").append(txtUsername.getText());
         ArrayList<String> readList = new ArrayList<>();
 
+        String USER_LOGIN_PATH = "user_login_log.txt";
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(USER_LOGIN_PATH))) {
             String line = bufferedReader.readLine();
             while (line != null) {
@@ -127,6 +126,7 @@ public class Login implements Initializable {
             if (txtPassword.getText().compareTo(User.getPassword()) == 0) {
                 addMessage(correctAuth);
                 lblError.setText(correctAuth);
+                String NO_ERROR = "-fx-text-fill: rgba(25, 205, 25, 1);";
                 lblError.setStyle(NO_ERROR);
                 isValid = true;
             } else {
@@ -145,7 +145,6 @@ public class Login implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println(url);
         resourceBundle = ResourceBundle.getBundle("com.michaelhefner/Nat", Locale.getDefault());
         if (Locale.getDefault().getLanguage().equals("es")
                 || Locale.getDefault().getLanguage().equals("fr")

@@ -60,7 +60,7 @@ public class MainPage implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try{
+        try {
             populateCustomerDataFromDB();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -89,10 +89,8 @@ public class MainPage implements Initializable {
 
         customerFilteredList = new FilteredList<Customer>(JDBCEntries.getAllCustomers(), customer -> true);
         tblCustomer.setItems(customerFilteredList);
-        tblCustomer.getSelectionModel().selectedItemProperty().addListener((observableValue, customer, t1) -> {
-            if (t1 != null)
-                customerIdToBeModified = (Customer) t1;
-        });
+        tblCustomer.getSelectionModel().selectedItemProperty().addListener(
+                (observableValue, customer, t1) -> customerIdToBeModified = t1 == null ? null : (Customer) t1);
 
     }
 
@@ -140,12 +138,14 @@ public class MainPage implements Initializable {
 
     @FXML
     public void openModifyCust() throws IOException {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("../View/AddCust.fxml"));
-        AnchorPane root = loader.load();
-        AddCust addCust = loader.getController();
-        addCust.isModify(customerIdToBeModified);
-        openStage(null, root);
+        if (customerIdToBeModified != null) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("../View/AddCust.fxml"));
+            AnchorPane root = loader.load();
+            AddCust addCust = loader.getController();
+            addCust.isModify(customerIdToBeModified);
+            openStage(null, root);
+        }
 
     }
 

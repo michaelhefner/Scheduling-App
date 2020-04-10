@@ -77,19 +77,13 @@ public class AddCust implements Initializable {
                         "Select OK to retry");
             }
         } else if (isValid && isModifyCustomer) {
-                updateCustomerInfo();
-//            Country country = updateCountryToDB();
-//            City city = (country.getId() > 0 ? addCityToDB(country.getId()) : null);
-//            Address address = (city.getId() > 0 ? addAddressToDB(city.getId()) : null);
-//            Customer customer = (address.getId() > 0 ? addCustomerToDB(address.getId()) : null);
-//            if (customer.getId() > 0) {
-//                Connect.closeConnection();
-//                JDBCEntries.addCustomer(customer);
-//                closeWindow();
-//            } else {
-//                showAlert("Error", "There was an error uploading information to database",
-//                        "Select OK to retry");
-//            }
+            if (updateCustomerInfo()) {
+                Connect.closeConnection();
+                closeWindow();
+            } else {
+                showAlert("Error", "There was an error uploading information to database",
+                        "Select OK to retry");
+            }
         }
     }
 
@@ -224,6 +218,26 @@ public class AddCust implements Initializable {
                 + "', lastUpdate = NOW()"
                 + " WHERE cityId = "
                 + customerToModify.getCity().getId());
+        statement.executeUpdate("UPDATE address SET address = '"
+                + txtAddress.getText() + "', "
+                + "address2 = '"
+                + txtAddress2.getText() + "', "
+                + "phone = '"
+                + txtPhone.getText() + "', "
+                + "postalCode = '"
+                + txtPostalCode.getText()
+                + "', lastUpdateBy = '"
+                + User.getName()
+                + "', lastUpdate = NOW()"
+                + " WHERE addressId = "
+                + customerToModify.getAddress().getId());
+        statement.executeUpdate("UPDATE customer SET customerName = '"
+                + txtName.getText()
+                + "', lastUpdateBy = '"
+                + User.getName()
+                + "', lastUpdate = NOW()"
+                + " WHERE customerId = "
+                + customerToModify.getId());
 
         if (statement.getUpdateCount() < 1)
             return false;
@@ -245,13 +259,13 @@ public class AddCust implements Initializable {
     }
 
     @FXML
-    public void closeWindow() {
+    public void closeWindowWithAlert() {
         if (showAlert("Cancel", "You are about to close this window", "Select OK to proceed")) {
-            close();
+            closeWindow();
         }
     }
 
-    private void close() {
+    private void closeWindow() {
         Stage stage = (Stage) btnCancel.getScene().getWindow();
         stage.close();
     }
