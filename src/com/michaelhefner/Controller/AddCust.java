@@ -15,20 +15,12 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AddCust implements Initializable {
-
-    final private String EMPTY_ERROR =
-            "-fx-background-color: rgba(255, 0, 0, 0.1);" +
-                    " -fx-border-color: rgba(255,0,0,1);";
-
-    final private String NO_ERROR =
-            "-fx-background-color: rgba(255, 255, 255, 1);";
-
-    final private Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
     @FXML
     private Text txtHeading;
@@ -49,12 +41,20 @@ public class AddCust implements Initializable {
     @FXML
     private Button btnCancel;
 
+    final private Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     private boolean isModifyCustomer = false;
     private Customer customerToModify;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+    }
+
+    @FXML
+    public void closeWindowWithAlert() {
+        if (showAlert("Cancel", "You are about to close this window", "Select OK to proceed")) {
+            closeWindow();
+        }
     }
 
     @FXML
@@ -65,18 +65,26 @@ public class AddCust implements Initializable {
                 txtAddress, txtAddress2, txtCity, txtCountry, txtName, txtPhone, txtPhone, txtPostalCode});
         if (isValid && !isModifyCustomer) {
             Country country = addCountryToDB();
-            City city = (country.getId() > 0 ? addCityToDB(country.getId()) : null);
-            Address address = (city.getId() > 0 ? addAddressToDB(city.getId()) : null);
-            Customer customer = (address.getId() > 0 ? addCustomerToDB(address.getId()) : null);
-            if (customer.getId() > 0) {
-                Connect.closeConnection();
-                JDBCEntries.addCustomer(customer);
-                closeWindow();
-            } else {
-                showAlert("Error", "There was an error uploading information to database",
-                        "Select OK to retry");
+            City city = null;
+            Address address = null;
+            Customer customer = null;
+            if (country != null) city = (country.getId() > 0 ? addCityToDB(country.getId()) : null);
+            if (city != null) address = (city.getId() > 0 ? addAddressToDB(city.getId()) : null);
+            if (address != null) customer = (address.getId() > 0 ? addCustomerToDB(address.getId()) : null);
+            if (customer != null) {
+                customer.setCountry(country);
+                customer.setCity(city);
+                customer.setAddress(address);
+                if (customer.getId() > 0) {
+                    Connect.closeConnection();
+                    JDBCEntries.addCustomer(customer);
+                    closeWindow();
+                } else {
+                    showAlert("Error", "There was an error uploading information to database",
+                            "Select OK to retry");
+                }
             }
-        } else if (isValid && isModifyCustomer) {
+        } else if (isValid) {
             if (updateCustomerInfo()) {
                 Connect.closeConnection();
                 closeWindow();
@@ -89,14 +97,23 @@ public class AddCust implements Initializable {
 
     public Customer addCustomerToDB(int addressId) throws SQLException {
         Customer customer = new Customer(txtName.getText(), addressId, 1);
-        Statement statement = Query.getStatement();
-        statement.executeUpdate("INSERT INTO customer(customerName, addressId, active, " +
-                "createDate, createdBy, lastUpdateBy) values('" + customer.getName() + "', " +
-                addressId + ", " + customer.getActive() + ", NOW(), '" + User.getName() +
-                "', '" + User.getName() + "')");
-        if (statement.getUpdateCount() < 1)
+
+        Map<Integer, Object> hashMap = new HashMap<>();
+        hashMap.put(1, customer.getName());
+        hashMap.put(2, addressId);
+        hashMap.put(3, customer.getActive());
+        hashMap.put(4, User.getName());
+        hashMap.put(5, User.getName());
+
+        int customerResultSet = Query.executeUpdate("INSERT INTO customer(customerName, addressId, active, " +
+                "createDate, createdBy, lastUpdateBy) values(?,?,?,NOW(),?,?)", hashMap);
+
+        System.out.println("customer result set = " + customerResultSet);
+        ResultSet resultSet = Query.executeQuery("SELECT * FROM customer", null);
+        if (customerResultSet == 0) {
+            System.out.println("country result set failed to insert");
             return null;
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM customer");
+        }
         int customerId = 0;
         while (resultSet.next())
             if (resultSet.last())
@@ -105,6 +122,7 @@ public class AddCust implements Initializable {
             customer.setId(customerId);
         else
             Connect.closeConnection();
+        System.out.println("customer id = " + customer.getId());
         return customer;
     }
 
@@ -116,21 +134,24 @@ public class AddCust implements Initializable {
                 txtPostalCode.getText(),
                 txtPhone.getText());
 
-        Statement statement = Query.getStatement();
-        statement.executeUpdate("INSERT INTO address(address, address2, cityId, postalCode, phone, " +
-                "createDate, createdBy, lastUpdateBy) values('"
-                + address.getAddress() + "', '"
-                + address.getAddress2() + "', "
-                + cityId + ", '"
-                + address.getPostalCode() + "', '"
-                + address.getPhone()
-                + "', NOW(), '"
-                + User.getName() + "', '"
-                + User.getName() + "')");
+        Map<Integer, Object> hashMap = new HashMap<>();
+        hashMap.put(1, address.getAddress());
+        hashMap.put(2, address.getAddress2());
+        hashMap.put(3, cityId);
+        hashMap.put(4, address.getPostalCode());
+        hashMap.put(5, address.getPhone());
+        hashMap.put(6, User.getName());
+        hashMap.put(7, User.getName());
+        int addressResultSet = Query.executeUpdate(
+                "INSERT INTO address(address, address2, cityId, postalCode, phone, " +
+                        "createDate, createdBy, lastUpdateBy) values(?,?,?,?,?,NOW(),?,?)", hashMap);
 
-        if (statement.getUpdateCount() < 1)
+        System.out.println("address result set = " + addressResultSet);
+        ResultSet resultSet = Query.executeQuery("SELECT * FROM address", null);
+        if (addressResultSet == 0) {
+            System.out.println("address result set failed to insert");
             return null;
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM address");
+        }
         int addressId = 0;
         while (resultSet.next())
             if (resultSet.last())
@@ -139,21 +160,28 @@ public class AddCust implements Initializable {
             address.setId(addressId);
         else
             Connect.closeConnection();
+        System.out.println("address id = " + address.getId());
         return address;
     }
 
     public City addCityToDB(int countryId) throws SQLException {
         City city = new City(txtCity.getText(), countryId);
-        Statement statement = Query.getStatement();
-        statement.executeUpdate("INSERT INTO city(city, countryId, createDate, createdBy, lastUpdateBy) values('"
-                + txtCity.getText()
-                + "', " + countryId
-                + ", NOW(), '"
-                + User.getName() + "', '"
-                + User.getName() + "')");
-        if (statement.getUpdateCount() < 1)
+
+        Map<Integer, Object> hashMap = new HashMap<>();
+        hashMap.put(1, txtCity.getText());
+        hashMap.put(2, countryId);
+        hashMap.put(3, User.getName());
+        hashMap.put(4, User.getName());
+
+        int countryResultSet = Query.executeUpdate("INSERT INTO city(city, countryId, createDate, " +
+                "createdBy, lastUpdateBy) values(?,?,NOW(),?,?)", hashMap);
+
+        System.out.println("country result = " + countryResultSet);
+        ResultSet resultSet = Query.executeQuery("SELECT * FROM city", null);
+        if (countryResultSet == 0) {
+            System.out.println("country result set failed to insert");
             return null;
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM city");
+        }
         int cityId = 0;
         while (resultSet.next())
             if (resultSet.last())
@@ -162,25 +190,25 @@ public class AddCust implements Initializable {
             city.setId(cityId);
         else
             Connect.closeConnection();
+        System.out.println("city id = " + city.getId());
         return city;
     }
 
     public Country addCountryToDB() throws SQLException {
         Country country = new Country(txtCountry.getText());
-        Query.setStatement(Connect.getConnection());
-        Statement statement = Query.getStatement();
-        statement.executeUpdate("INSERT INTO country(country, createDate, createdBy, lastUpdateBy)"
-                + " values('"
-                + txtCountry.getText()
-                + "', NOW(), '"
-                + User.getName()
-                + "', '"
-                + User.getName()
-                + "')");
 
-        if (statement.getUpdateCount() < 1)
+        Map<Integer, Object> countryMap = new HashMap<>();
+        countryMap.put(1, txtCountry.getText());
+        countryMap.put(2, User.getName());
+        countryMap.put(3, User.getName());
+        int countryResultSet = Query.executeUpdate("INSERT INTO country(country, createDate, " +
+                "createdBy, lastUpdateBy) values(?,NOW(),?,?)", countryMap);
+
+        ResultSet resultSet = Query.executeQuery("SELECT * FROM country", null);
+        if (countryResultSet == 0) {
+            System.out.println("country result set failed to insert");
             return null;
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM country");
+        }
         int countryId = 0;
         while (resultSet.next())
             if (resultSet.last())
@@ -189,6 +217,7 @@ public class AddCust implements Initializable {
             country.setId(countryId);
         else
             Connect.closeConnection();
+        System.out.println("country id = " + country.getId());
         return country;
     }
 
@@ -202,45 +231,52 @@ public class AddCust implements Initializable {
         customerToModify.getAddress().setPhone(txtPhone.getText());
         customerToModify.getCity().setCity(txtCity.getText());
 
-        Query.setStatement(Connect.getConnection());
-        Statement statement = Query.getStatement();
-        statement.executeUpdate("UPDATE country set country = '"
-                + txtCountry.getText()
-                + "', lastUpdateBy = '"
-                + User.getName()
-                + "', lastUpdate = NOW()"
-                + " WHERE countryId = "
-                + customerToModify.getCountry().getId());
-        statement.executeUpdate("UPDATE city SET city = '"
-                + txtCity.getText()
-                + "', lastUpdateBy = '"
-                + User.getName()
-                + "', lastUpdate = NOW()"
-                + " WHERE cityId = "
-                + customerToModify.getCity().getId());
-        statement.executeUpdate("UPDATE address SET address = '"
-                + txtAddress.getText() + "', "
-                + "address2 = '"
-                + txtAddress2.getText() + "', "
-                + "phone = '"
-                + txtPhone.getText() + "', "
-                + "postalCode = '"
-                + txtPostalCode.getText()
-                + "', lastUpdateBy = '"
-                + User.getName()
-                + "', lastUpdate = NOW()"
-                + " WHERE addressId = "
-                + customerToModify.getAddress().getId());
-        statement.executeUpdate("UPDATE customer SET customerName = '"
-                + txtName.getText()
-                + "', lastUpdateBy = '"
-                + User.getName()
-                + "', lastUpdate = NOW()"
-                + " WHERE customerId = "
-                + customerToModify.getId());
+        Map<Integer, Object> hashMap = new HashMap<>();
+        hashMap.put(1, txtCountry.getText());
+        hashMap.put(2, User.getName());
+        hashMap.put(3, customerToModify.getCountry().getId());
 
-        if (statement.getUpdateCount() < 1)
+        int resultSet = Query.executeUpdate("UPDATE country set country = ?, lastUpdateBy = ?, lastUpdate = NOW() " +
+                "WHERE countryId = ?", hashMap);
+
+        if (resultSet == 0)
             return false;
+
+        hashMap = new HashMap<>();
+        hashMap.put(1, txtCity.getText());
+        hashMap.put(2, User.getName());
+        hashMap.put(3, customerToModify.getCity().getId());
+
+        resultSet = Query.executeUpdate("UPDATE city SET city = ?, lastUpdateBy = ?, lastUpdate = NOW() " +
+                "WHERE cityId = ?", hashMap);
+
+        if (resultSet == 0)
+            return false;
+
+        hashMap = new HashMap<>();
+        hashMap.put(1, txtAddress.getText());
+        hashMap.put(2, txtAddress2.getText());
+        hashMap.put(3, txtPhone.getText());
+        hashMap.put(4, txtPostalCode.getText());
+        hashMap.put(5, User.getName());
+        hashMap.put(6, customerToModify.getAddress().getId());
+
+        resultSet = Query.executeUpdate("UPDATE address SET address = ?, address2 = ?, phone = ?, postalCode = ?, " +
+                "lastUpdateBy = ?, lastUpdate = NOW() WHERE addressId = ?", hashMap);
+
+        if (resultSet == 0)
+            return false;
+
+        hashMap = new HashMap<>();
+        hashMap.put(1, txtName.getText());
+        hashMap.put(2, User.getName());
+        hashMap.put(3, customerToModify.getId());
+        resultSet = Query.executeUpdate("UPDATE customer SET customerName = ?, lastUpdateBy = ?, " +
+                "lastUpdate = NOW() WHERE customerId = ?", hashMap);
+
+        if (resultSet == 0)
+            return false;
+
         JDBCEntries.updateCustomer(indexOfCustomerToModify, customerToModify);
         return true;
     }
@@ -255,14 +291,7 @@ public class AddCust implements Initializable {
         txtPostalCode.setText(customer.getAddress().getPostalCode());
         txtPhone.setText(customer.getAddress().getPhone());
         isModifyCustomer = true;
-        customerToModify = (Customer) customer;
-    }
-
-    @FXML
-    public void closeWindowWithAlert() {
-        if (showAlert("Cancel", "You are about to close this window", "Select OK to proceed")) {
-            closeWindow();
-        }
+        customerToModify = customer;
     }
 
     private void closeWindow() {
@@ -283,9 +312,12 @@ public class AddCust implements Initializable {
         boolean isValid = true;
         for (TextField field : textFields) {
             if (field.getText().isEmpty()) {
+                String EMPTY_ERROR = "-fx-background-color: rgba(255, 0, 0, 0.1);" +
+                        " -fx-border-color: rgba(255,0,0,1);";
                 field.setStyle(EMPTY_ERROR);
                 isValid = false;
             } else {
+                String NO_ERROR = "-fx-background-color: rgba(255, 255, 255, 1);";
                 field.setStyle(NO_ERROR);
             }
         }

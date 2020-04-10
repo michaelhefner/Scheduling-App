@@ -1,6 +1,5 @@
 package com.michaelhefner.Controller;
 
-import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
 import com.michaelhefner.Model.User;
 import javafx.fxml.FXML;
@@ -17,11 +16,8 @@ import java.io.*;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Login implements Initializable {
     private String noUserFound;
@@ -112,13 +108,12 @@ public class Login implements Initializable {
 
     public boolean verifyLogin() throws SQLException {
         boolean isValid = false;
-
         User.setName(txtUsername.getText().toLowerCase());
         System.out.println("username entered = " + User.getName());
-        Query.setStatement(Connect.getConnection());
-        Statement statement = Query.getStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT password FROM user where userName = '"
-                + User.getName() + "'");
+
+        Map<Integer, Object> mapList = new HashMap<>();
+        mapList.put(1, User.getName());
+        ResultSet resultSet = Query.executeQuery("SELECT password FROM user where userName = ?", mapList);
 
         if (resultSet.next()) {
             System.out.println("User found");

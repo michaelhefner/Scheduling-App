@@ -1,6 +1,9 @@
 package com.michaelhefner.Model.DB;
 
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Connect {
     private static final String protocol = "jdbc";
@@ -10,13 +13,12 @@ public class Connect {
     private static final String MYSQLJDBCDriver = "com.mysql.jdbc.Driver";
     private static final String username = "U05yp2";
     private static final String password = "53688646210";
-    private static java.sql.Connection connection = null;
+    private static Connection connection = null;
 
-    public static java.sql.Connection getConnection() {
+    public static Connection getConnection() {
         try {
             Class.forName(MYSQLJDBCDriver);
             connection = DriverManager.getConnection(jdbcUrl, username, password);
-            Statement statement = connection.createStatement();
             System.out.println("Connection to MySQL was successful.");
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -34,14 +36,3 @@ public class Connect {
         }
     }
 }
-
-//                LocalDateTime localDateTime = LocalDateTime.now();
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-//            String dateTime = formatter.format(localDateTime);
-//            statement.executeUpdate(
-//                    "insert into country values(0, 'Deer', '" + dateTime + "', 'bob', CONVERT(NOW(), CHAR), 'bobo')");
-//
-//            ResultSet rs = statement.executeQuery("select * from country");
-//            while (rs.next()) {
-//                System.out.println(rs.getString("createDate"));
-//            }

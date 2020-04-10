@@ -22,10 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainPage implements Initializable {
 
@@ -55,8 +52,6 @@ public class MainPage implements Initializable {
 
 
     private Customer customerIdToBeModified;
-    private FilteredList<Customer> customerFilteredList;
-    private FilteredList<Appointment> appointmentFilteredList;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -66,12 +61,12 @@ public class MainPage implements Initializable {
             e.printStackTrace();
         }
 
-        clmAppID.setCellValueFactory(new PropertyValueFactory<Appointment, String>("customerId"));
-        clmAppTitle.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));
-        clmAppStartDate.setCellValueFactory(new PropertyValueFactory<Appointment, String>("start"));
-        clmAppEndDate.setCellValueFactory(new PropertyValueFactory<Appointment, String>("end"));
+        clmAppID.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        clmAppTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        clmAppStartDate.setCellValueFactory(new PropertyValueFactory<>("start"));
+        clmAppEndDate.setCellValueFactory(new PropertyValueFactory<>("end"));
 
-        appointmentFilteredList = new FilteredList<Appointment>(JDBCEntries.getAllAppointments(), appointment -> true);
+        FilteredList<Appointment> appointmentFilteredList = new FilteredList<>(JDBCEntries.getAllAppointments(), appointment -> true);
         tblAppointments.setItems(appointmentFilteredList);
         tblAppointments.getSelectionModel().selectedItemProperty().addListener((observableValue, appointment, t1) -> {
 //            if (t1 != null)
@@ -81,16 +76,16 @@ public class MainPage implements Initializable {
 //                    partSelectedIsInhouse = false;
 //                partSelected = Inventory.lookupPart(t1.getId());
         });
-        clmCustID.setCellValueFactory(new PropertyValueFactory<Customer, String>("id"));
-        clmCustName.setCellValueFactory(new PropertyValueFactory<Customer, String>("name"));
-        clmCustAddress.setCellValueFactory(new PropertyValueFactory<Customer, String>("address"));
-        clmCustCity.setCellValueFactory(new PropertyValueFactory<Customer, String>("city"));
-        clmCustCountry.setCellValueFactory(new PropertyValueFactory<Customer, String>("country"));
+        clmCustID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        clmCustName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        clmCustAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+        clmCustCity.setCellValueFactory(new PropertyValueFactory<>("city"));
+        clmCustCountry.setCellValueFactory(new PropertyValueFactory<>("country"));
 
-        customerFilteredList = new FilteredList<Customer>(JDBCEntries.getAllCustomers(), customer -> true);
+        FilteredList<Customer> customerFilteredList = new FilteredList<>(JDBCEntries.getAllCustomers(), customer -> true);
         tblCustomer.setItems(customerFilteredList);
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
-                (observableValue, customer, t1) -> customerIdToBeModified = t1 == null ? null : (Customer) t1);
+                (observableValue, customer, t1) -> customerIdToBeModified = t1);
 
     }
 
@@ -101,12 +96,12 @@ public class MainPage implements Initializable {
         alert.setContentText("Would you like to proceed? (select OK to proceed exit)");
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 Platform.exit();
                 System.exit(0);
             } catch (Exception e) {
-                System.out.println(e);
+                e.printStackTrace();
             }
         }
     }
@@ -132,8 +127,35 @@ public class MainPage implements Initializable {
     }
 
     @FXML
-    public void deleteCust() {
+    public void deleteCust() throws SQLException {
+        if (customerIdToBeModified != null) {
+            alert.setTitle("Delete");
+            alert.setHeaderText("You are about to delete " + customerIdToBeModified.getName());
+            alert.setContentText("Are you sure you would like to proceed?");
 
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+
+                Map<Integer, Object> customerMap = new HashMap<>();
+                customerMap.put(1, customerIdToBeModified.getId());
+                Query.executeUpdate("DELETE FROM customer WHERE customerId =?", customerMap);
+
+                Map<Integer, Object> addressMap = new HashMap<>();
+                addressMap.put(1, customerIdToBeModified.getAddressId());
+                Query.executeUpdate("DELETE FROM address WHERE addressId =?", addressMap);
+
+                Map<Integer, Object> cityMap = new HashMap<>();
+                cityMap.put(1, customerIdToBeModified.getCity().getId());
+                Query.executeUpdate("DELETE FROM city WHERE cityId =?", cityMap);
+
+                Map<Integer, Object> countryMap = new HashMap<>();
+                countryMap.put(1, customerIdToBeModified.getCountry().getId());
+                Query.executeUpdate("DELETE FROM country WHERE countryId =?", countryMap);
+
+                JDBCEntries.deleteCustomer(customerIdToBeModified);
+                Connect.closeConnection();
+            }
+        }
     }
 
     @FXML
@@ -158,15 +180,12 @@ public class MainPage implements Initializable {
     public void handleSearchApp() {
     }
 
+
     private void populateCustomerDataFromDB() throws SQLException {
         ArrayList<Customer> customers = new ArrayList<>();
+        ResultSet customerResultSet = Query.executeQuery("SELECT * FROM customer");
 
-        Query.setStatement(Connect.getConnection());
-        Statement statement = Query.getStatement();
-
-        ResultSet customerResultSet = statement.executeQuery("SELECT * FROM customer");
         while (customerResultSet.next()) {
-
             Customer customer = new Customer(customerResultSet.getString("customerName"),
                     customerResultSet.getInt("addressId"),
                     customerResultSet.getInt("active"));
@@ -174,11 +193,10 @@ public class MainPage implements Initializable {
             customers.add(customer);
         }
         for (Customer c : customers) {
-            Statement addressStatement = Query.getStatement();
+            Map<Integer, Object> map = new HashMap<>();
 
-            ResultSet addressResultSet =
-                    addressStatement.executeQuery("SELECT * FROM address where addressId = "
-                            + c.getAddressId());
+            map.put(1, c.getAddressId());
+            ResultSet addressResultSet = Query.executeQuery("SELECT * FROM address where addressId = ?", map);
             addressResultSet.next();
             Address address = new Address(addressResultSet.getString("address"),
                     addressResultSet.getString("address2"),
@@ -187,19 +205,18 @@ public class MainPage implements Initializable {
                     addressResultSet.getString("phone"));
             address.setId(addressResultSet.getInt("addressId"));
 
-            Statement cityStatement = Query.getStatement();
-            ResultSet cityResultSet =
-                    cityStatement.executeQuery("SELECT * FROM city where cityId = "
-                            + address.getCityId());
+            Map<Integer, Object> cityMap = new HashMap<>();
+            cityMap.put(1, c.getAddressId());
+            ResultSet cityResultSet = Query.executeQuery("SELECT * FROM city where cityId = ?", cityMap);
             cityResultSet.next();
             City city = new City(cityResultSet.getString("city"),
                     cityResultSet.getInt("countryId"));
             city.setId(cityResultSet.getInt("cityId"));
 
-            Statement countryStatement = Query.getStatement();
-            ResultSet countryResultSet =
-                    countryStatement.executeQuery("SELECT * FROM country where countryId = "
-                            + city.getCountryId());
+            Map<Integer, Object> countryMap = new HashMap<>();
+
+            countryMap.put(1, city.getCountryId());
+            ResultSet countryResultSet = Query.executeQuery("SELECT * FROM country where countryId = ?", countryMap);
             countryResultSet.next();
             Country country = new Country(countryResultSet.getString("country"));
             country.setId(countryResultSet.getInt("countryId"));
@@ -220,7 +237,7 @@ public class MainPage implements Initializable {
             Stage newStage = new Stage();
             if (parent != null) {
                 newStage.setScene(new Scene(parent));
-            } else {
+            } else if (root != null) {
                 newStage.setScene(new Scene(root));
             }
             newStage.show();
