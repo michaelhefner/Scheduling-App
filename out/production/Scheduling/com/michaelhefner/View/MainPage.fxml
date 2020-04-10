@@ -27,13 +27,16 @@
                 </Text>
                 <Button fx:id="btnSearchCust" mnemonicParsing="false" onAction="#handleSearchCust" text="Search" />
                 <TextField fx:id="txtSearchCust" promptText="Search" />
-                <TableView fx:id="tblCustomer" prefHeight="150.0" prefWidth="500.0">
+                <TableView fx:id="tblCustomer" prefHeight="150.0">
                     <FlowPane.margin>
                         <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
                     </FlowPane.margin>
                     <columns>
-                        <TableColumn fx:id="clmCustID" prefWidth="250.0" text="Customer ID" />
-                        <TableColumn fx:id="clmCustName" prefWidth="250.0" text="Customer Name" />
+                        <TableColumn fx:id="clmCustID" prefWidth="30" text="ID" />
+                        <TableColumn fx:id="clmCustName" prefWidth="140" text="Name" />
+                        <TableColumn fx:id="clmCustAddress" prefWidth="140" text="Address" />
+                        <TableColumn fx:id="clmCustCity" prefWidth="140" text="City" />
+                        <TableColumn fx:id="clmCustCountry" prefWidth="60" text="Country" />
                     </columns>
                 </TableView>
                 <HBox alignment="CENTER_RIGHT" prefHeight="47.0" prefWidth="383.0">

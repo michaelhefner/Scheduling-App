@@ -36,4 +36,9 @@ public class City {
     }
 
 
+    @Override
+    public String toString(){
+        return city;
+    }
+
 }

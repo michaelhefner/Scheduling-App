@@ -2,6 +2,7 @@ package com.michaelhefner.Controller;
 
 import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
+import com.michaelhefner.Model.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -19,16 +20,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class Login implements Initializable {
     private final String USER_LOGIN_PATH = "user_login_log.txt";
-    private final String NO_USER_FOUND = "No user found by that name";
-    private final String NO_PASSWORD = "No password entered.";
-    private final String NO_USERNAME = "No username entered.";
-    private final String CORRECT_AUTH = "Success";
+    private String noUserFound;
+    private String noPassword;
+    private String noUsername;
+    private String correctAuth;
     private final String NO_ERROR = "-fx-text-fill: rgba(25, 205, 25, 1);";
-    private final String INCORRECT_AUTH = "Incorrect username and password entered.";
+    private String incorrectAuth;
 
     private StringBuilder writeBuilder;
 
@@ -50,12 +52,12 @@ public class Login implements Initializable {
         LocalDateTime dateTime = LocalDateTime.now();
         writeBuilder.append(dateTime);
         if (txtUsername.getText().isEmpty()) {
-            addMessage(NO_USERNAME);
-            lblError.setText(NO_USERNAME);
+            addMessage(noUsername);
+            lblError.setText(noUsername);
         } else {
             if (txtPassword.getText().isEmpty()) {
-                addMessage(NO_PASSWORD);
-                lblError.setText(NO_PASSWORD);
+                addMessage(noPassword);
+                lblError.setText(noPassword);
             } else {
                 if (verifyLogin()) {
                     logToUserFile();
@@ -112,29 +114,29 @@ public class Login implements Initializable {
     public boolean verifyLogin() throws SQLException {
         boolean isValid = false;
 
-        String username = txtUsername.getText().toLowerCase();
-        System.out.println("username entered = " + username);
+        User.setName(txtUsername.getText().toLowerCase());
+        System.out.println("username entered = " + User.getName());
         Query.setStatement(Connect.getConnection());
         Statement statement = Query.getStatement();
         ResultSet resultSet = statement.executeQuery("SELECT password FROM user where userName = '"
-                + username + "'");
+                + User.getName() + "'");
 
         if (resultSet.next()) {
             System.out.println("User found");
-            String password = resultSet.getString("password");
-            if (txtPassword.getText().compareTo(password) == 0) {
-                addMessage(CORRECT_AUTH);
-                lblError.setText(CORRECT_AUTH);
+            User.setPassword(resultSet.getString("password"));
+            if (txtPassword.getText().compareTo(User.getPassword()) == 0) {
+                addMessage(correctAuth);
+                lblError.setText(correctAuth);
                 lblError.setStyle(NO_ERROR);
                 isValid = true;
             } else {
-                addMessage(INCORRECT_AUTH);
-                lblError.setText(INCORRECT_AUTH);
+                addMessage(incorrectAuth);
+                lblError.setText(incorrectAuth);
             }
         } else {
-            System.out.println(NO_USER_FOUND);
-            addMessage(NO_USER_FOUND);
-            lblError.setText(NO_USER_FOUND);
+            System.out.println(noUserFound);
+            addMessage(noUserFound);
+            lblError.setText(noUserFound);
         }
 
         return isValid;
@@ -143,5 +145,16 @@ public class Login implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        System.out.println(url);
+        resourceBundle = ResourceBundle.getBundle("com.michaelhefner/Nat", Locale.getDefault());
+        if (Locale.getDefault().getLanguage().equals("es")
+                || Locale.getDefault().getLanguage().equals("fr")
+                || Locale.getDefault().getLanguage().equals("en")) {
+            noUserFound = resourceBundle.getString("NO_USER_FOUND");
+            noPassword = resourceBundle.getString("NO_PASSWORD");
+            noUsername = resourceBundle.getString("NO_USERNAME");
+            correctAuth = resourceBundle.getString("CORRECT_AUTH");
+            incorrectAuth = resourceBundle.getString("INCORRECT_AUTH");
+        }
     }
 }
