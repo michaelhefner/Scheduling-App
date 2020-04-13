@@ -2,6 +2,8 @@ package com.michaelhefner.Controller;
 
 import com.michaelhefner.Model.Appointment;
 import com.michaelhefner.Model.Customer;
+import com.michaelhefner.Model.DB.Connect;
+import com.michaelhefner.Model.DB.Query;
 import com.michaelhefner.Model.JDBCEntries;
 import com.michaelhefner.Model.User;
 import javafx.collections.FXCollections;
@@ -17,6 +19,8 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -94,20 +98,27 @@ public class AddApp implements Initializable {
     @FXML
     public void onSaveClicked() throws SQLException {
         boolean isValid = checkForEmptyField(new TextField[]{
-                txtLocation, txtTitle, txtType, txtUrl},
+                        txtLocation, txtTitle, txtType, txtUrl},
                 txtDescription,
-                new DatePicker[] {dpStart, dpEnd});
+                new DatePicker[]{dpStart, dpEnd});
 
+
+        int startHourConverted = (Integer.parseInt(cbStartHour.getValue()) + 12) == 24 ? 12
+                : (Integer.parseInt(cbStartHour.getValue()) + 12);
+        int endHourConverted = (Integer.parseInt(cbEndHour.getValue()) + 12) == 24 ? 12
+                : (Integer.parseInt(cbEndHour.getValue()) + 12);
 
         startAppointmentDateTime = (dpStart.getValue() != null) ? LocalDateTime.of(dpStart.getValue().getYear(),
                 dpStart.getValue().getMonth(),
                 dpStart.getValue().getDayOfMonth(),
-                (cbStart.getValue() == "PM") ? Integer.parseInt(cbStartHour.getValue()) + 12 : Integer.parseInt(cbStartHour.getValue()),
+                (cbStart.getValue() == "PM") ? startHourConverted
+                        : Integer.parseInt(cbStartHour.getValue()),
                 Integer.parseInt(cbStartMin.getValue())) : null;
         endAppointmentDateTime = (dpEnd.getValue() != null) ? LocalDateTime.of(dpEnd.getValue().getYear(),
                 dpEnd.getValue().getMonth(),
                 dpEnd.getValue().getDayOfMonth(),
-                (cbEnd.getValue() == "PM") ? Integer.parseInt(cbEndHour.getValue()) + 12 : Integer.parseInt(cbEndHour.getValue()),
+                (cbEnd.getValue() == "PM") ? endHourConverted
+                        : Integer.parseInt(cbEndHour.getValue()),
                 Integer.parseInt(cbEndMin.getValue())) : null;
 
         if (dpStart.getValue() != null && dpEnd.getValue() != null) {
@@ -147,136 +158,35 @@ public class AddApp implements Initializable {
                     User.getId(), txtTitle.getText(), txtDescription.getText(), txtLocation.getText(), customerToAddToAppointment.getName(),
                     txtType.getText(), txtUrl.getText(), startAppointmentDateTime, endAppointmentDateTime);
         }
-        System.out.println(appointment.getTitle());
-        System.out.println(appointment.getContact());
-        System.out.println(appointment.getDescription());
-        System.out.println(appointment.getStart());
-        System.out.println(appointment.getEnd());
+
+        Map<Integer, Object> hashMap = new HashMap<>();
+        hashMap.put(1, appointment.getCustomerId());
+        hashMap.put(2, appointment.getUserId());
+        hashMap.put(3, appointment.getTitle());
+        hashMap.put(4, appointment.getDescription());
+        hashMap.put(5, appointment.getLocation());
+        hashMap.put(6, appointment.getContact());
+        hashMap.put(7, appointment.getType());
+        hashMap.put(8, appointment.getUrl());
+        hashMap.put(9, appointment.getStart().toLocalDate() + " " + appointment.getStart().toLocalTime());
+        hashMap.put(10, appointment.getEnd().toLocalDate() + " " + appointment.getEnd().toLocalTime());
+        hashMap.put(11, User.getName());
+        hashMap.put(12, User.getName());
+
+
+        int appointmentResult = Query.executeUpdate("INSERT INTO appointment(customerId, userId, title, " +
+                "description, location, contact, type, url, start, end, createDate, createdBy, lastUpdateBy)" +
+                " values(?,?,?,?,?,?,?,?,?,?,NOW(),?,?)", hashMap);
+//        ResultSet resultSet = Query.executeQuery("SELECT * FROM appointment", null);
+        if (appointmentResult == 0) {
+            System.out.println("country result set failed to insert");
+            showAlert("Failed", "Appointment failed to save in database.", "Select 'OK' to retry");
+        } else {
+            JDBCEntries.addAppointment(appointment);
+            closeWindow();
+        }
+        Connect.closeConnection();
     }
-//
-//        Map<Integer, Object> hashMap = new HashMap<>();
-//        hashMap.put(1, customer.getName());
-//        hashMap.put(2, addressId);
-//        hashMap.put(3, customer.getActive());
-//        hashMap.put(4, User.getName());
-//        hashMap.put(5, User.getName());
-//
-//
-//        int customerResultSet = Query.executeUpdate("INSERT INTO customer(customerName, addressId, active, " +
-//                "createDate, createdBy, lastUpdateBy) values(?,?,?,NOW(),?,?)", hashMap);
-//
-//        System.out.println("customer result set = " + customerResultSet);
-//        ResultSet resultSet = Query.executeQuery("SELECT * FROM customer", null);
-//        if (customerResultSet == 0) {
-//            System.out.println("country result set failed to insert");
-//            return null;
-//        }
-//        int customerId = 0;
-//        while (resultSet.next())
-//            if (resultSet.last())
-//                customerId = Integer.parseInt(resultSet.getString("customerId"));
-//        if (customerId > 0)
-//            customer.setId(customerId);
-//        else
-//            Connect.closeConnection();
-//        System.out.println("customer id = " + customer.getId());
-//        return customer;
-//    }
-
-//    public Address addAddressToDB(int cityId) throws SQLException {
-//        Address address = new Address(
-//                txtAddress.getText(),
-//                txtAddress2.getText(),
-//                cityId,
-//                txtPostalCode.getText(),
-//                txtPhone.getText());
-//
-//        Map<Integer, Object> hashMap = new HashMap<>();
-//        hashMap.put(1, address.getAddress());
-//        hashMap.put(2, address.getAddress2());
-//        hashMap.put(3, cityId);
-//        hashMap.put(4, address.getPostalCode());
-//        hashMap.put(5, address.getPhone());
-//        hashMap.put(6, User.getName());
-//        hashMap.put(7, User.getName());
-//        int addressResultSet = Query.executeUpdate(
-//                "INSERT INTO address(address, address2, cityId, postalCode, phone, " +
-//                        "createDate, createdBy, lastUpdateBy) values(?,?,?,?,?,NOW(),?,?)", hashMap);
-//
-//        System.out.println("address result set = " + addressResultSet);
-//        ResultSet resultSet = Query.executeQuery("SELECT * FROM address", null);
-//        if (addressResultSet == 0) {
-//            System.out.println("address result set failed to insert");
-//            return null;
-//        }
-//        int addressId = 0;
-//        while (resultSet.next())
-//            if (resultSet.last())
-//                addressId = Integer.parseInt(resultSet.getString("addressId"));
-//        if (addressId > 0)
-//            address.setId(addressId);
-//        else
-//            Connect.closeConnection();
-//        System.out.println("address id = " + address.getId());
-//        return address;
-//    }
-
-//    public City addCityToDB(int countryId) throws SQLException {
-//        City city = new City(txtCity.getText(), countryId);
-//
-//        Map<Integer, Object> hashMap = new HashMap<>();
-//        hashMap.put(1, txtCity.getText());
-//        hashMap.put(2, countryId);
-//        hashMap.put(3, User.getName());
-//        hashMap.put(4, User.getName());
-//
-//        int countryResultSet = Query.executeUpdate("INSERT INTO city(city, countryId, createDate, " +
-//                "createdBy, lastUpdateBy) values(?,?,NOW(),?,?)", hashMap);
-//
-//        System.out.println("country result = " + countryResultSet);
-//        ResultSet resultSet = Query.executeQuery("SELECT * FROM city", null);
-//        if (countryResultSet == 0) {
-//            System.out.println("country result set failed to insert");
-//            return null;
-//        }
-//        int cityId = 0;
-//        while (resultSet.next())
-//            if (resultSet.last())
-//                cityId = Integer.parseInt(resultSet.getString("cityId"));
-//        if (cityId > 0)
-//            city.setId(cityId);
-//        else
-//            Connect.closeConnection();
-//        System.out.println("city id = " + city.getId());
-//        return city;
-//    }
-
-//    public Country addCountryToDB() throws SQLException {
-//        Country country = new Country(txtCountry.getText());
-//
-//        Map<Integer, Object> countryMap = new HashMap<>();
-//        countryMap.put(1, txtCountry.getText());
-//        countryMap.put(2, User.getName());
-//        countryMap.put(3, User.getName());
-//        int countryResultSet = Query.executeUpdate("INSERT INTO country(country, createDate, " +
-//                "createdBy, lastUpdateBy) values(?,NOW(),?,?)", countryMap);
-//
-//        ResultSet resultSet = Query.executeQuery("SELECT * FROM country", null);
-//        if (countryResultSet == 0) {
-//            System.out.println("country result set failed to insert");
-//            return null;
-//        }
-//        int countryId = 0;
-//        while (resultSet.next())
-//            if (resultSet.last())
-//                countryId = Integer.parseInt(resultSet.getString("countryId"));
-//        if (countryId > 0)
-//            country.setId(countryId);
-//        else
-//            Connect.closeConnection();
-//        System.out.println("country id = " + country.getId());
-//        return country;
-//    }
 
 //    public boolean updateCustomerInfo() throws SQLException {
 //        int indexOfCustomerToModify = JDBCEntries.getAllCustomers().indexOf(customerToModify);
@@ -378,8 +288,8 @@ public class AddApp implements Initializable {
             return "12";
         else if (hour < 10)
             return "0" + hour;
-        else if (hour - 12 < 10)
-            return "0" + (hour - 12);
+        else if (hour < 13)
+            return Integer.toString(hour);
         else
             return Integer.toString(hour - 12);
     }
@@ -393,8 +303,9 @@ public class AddApp implements Initializable {
             endHour.add(b);
         }
         for (int i = 1; i < 61; i++) {
-            startMin.add(Integer.toString(i));
-            endMin.add(Integer.toString(i));
+            String b = (i < 10) ? "0" + i : Integer.toString(i);
+            startMin.add(b);
+            endMin.add(b);
         }
         startAMPM.add("AM");
         startAMPM.add("PM");
@@ -412,7 +323,7 @@ public class AddApp implements Initializable {
 
         cbStartHour.setValue(getHour2DigitFormat(localDateTime.getHour()));
         cbEndHour.setValue(getHour2DigitFormat(localDateTime.getHour() + 1));
-        if (localDateTime.getHour() > 12) {
+        if (localDateTime.getHour() > 11) {
             cbStart.setValue("PM");
             cbEnd.setValue("PM");
         } else {
