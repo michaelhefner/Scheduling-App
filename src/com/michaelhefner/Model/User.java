@@ -1,10 +1,17 @@
 package com.michaelhefner.Model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 public class User {
     private static String name;
+
+    public static String getId() {
+        return id;
+    }
+
+    public static void setId(String id) {
+        User.id = id;
+    }
+
+    private static String id;
     private static String password;
     private int active;
     public static String getPassword() {

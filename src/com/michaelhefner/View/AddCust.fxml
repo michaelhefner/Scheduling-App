@@ -4,122 +4,130 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.michaelhefner.Controller.AddCust">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.michaelhefner.Controller.AddCust">
     <children>
-        <Text fx:id="txtHeading" strokeType="OUTSIDE" strokeWidth="0.0" text="Add Customer" textAlignment="CENTER" wrappingWidth="600.0000029802322" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <Text fx:id="txtHeading" strokeType="OUTSIDE" strokeWidth="0.0" text="Add Customer" textAlignment="CENTER"
+              wrappingWidth="600.0000029802322" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
             <font>
-                <Font size="24.0" />
+                <Font size="24.0"/>
             </font>
         </Text>
-        <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="75.0">
+        <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                  AnchorPane.topAnchor="75.0">
             <columnConstraints>
-                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="125.0" minWidth="10.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" minWidth="10.0" />
-                <ColumnConstraints />
-                <ColumnConstraints />
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="125.0" minWidth="10.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" minWidth="10.0"/>
+                <ColumnConstraints/>
+                <ColumnConstraints/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints/>
             </rowConstraints>
             <children>
                 <Label prefHeight="17.0" text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
                 <TextField fx:id="txtName" promptText="Customer Name" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
-                <Label prefHeight="17.0" text="Address" textAlignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <Label prefHeight="17.0" text="Address" textAlignment="RIGHT" GridPane.columnIndex="0"
+                       GridPane.rowIndex="1">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
                 <TextField fx:id="txtAddress" promptText="Address" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
                 <Label prefHeight="17.0" text="Address 2" GridPane.columnIndex="0" GridPane.rowIndex="2">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
                 <TextField fx:id="txtAddress2" promptText="Address 2" GridPane.columnIndex="1" GridPane.rowIndex="2">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
                 <Label prefHeight="20.0" text="City" GridPane.columnIndex="0" GridPane.rowIndex="3">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
                 <TextField fx:id="txtCity" promptText="City" GridPane.columnIndex="1" GridPane.rowIndex="3">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
                 <Label prefHeight="17.0" text="Postal Code" GridPane.columnIndex="0" GridPane.rowIndex="4">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="txtPostalCode" promptText="Postal Code" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                <TextField fx:id="txtPostalCode" promptText="Postal Code" GridPane.columnIndex="1"
+                           GridPane.rowIndex="4">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
                 <Label prefHeight="17.0" text="Country" GridPane.columnIndex="0" GridPane.rowIndex="5">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
                 <TextField fx:id="txtCountry" promptText="Country" GridPane.columnIndex="1" GridPane.rowIndex="5">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
                 <Label prefHeight="17.0" text="Phone" GridPane.columnIndex="0" GridPane.rowIndex="6">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
                 <TextField fx:id="txtPhone" promptText="Phone Number" GridPane.columnIndex="1" GridPane.rowIndex="6">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
             </children>
             <opaqueInsets>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
             </opaqueInsets>
         </GridPane>
-        <HBox alignment="CENTER_RIGHT" layoutX="185.0" layoutY="268.0" prefHeight="100.0" prefWidth="387.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <HBox alignment="CENTER_RIGHT" layoutX="185.0" layoutY="268.0" prefHeight="100.0" prefWidth="387.0"
+              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <Button fx:id="btnSave" mnemonicParsing="false" onAction="#onSaveClicked" text="Save">
                     <font>
-                        <Font size="18.0" />
+                        <Font size="18.0"/>
                     </font>
                     <HBox.margin>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
                     </HBox.margin>
                 </Button>
                 <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#closeWindowWithAlert" text="Cancel">
                     <font>
-                        <Font size="18.0" />
+                        <Font size="18.0"/>
                     </font>
                     <HBox.margin>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
                     </HBox.margin>
                 </Button>
             </children>

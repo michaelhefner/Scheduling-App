@@ -10,10 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -26,9 +23,18 @@ import java.util.*;
 
 public class MainPage implements Initializable {
 
+    private FilteredList<Appointment> appointmentFilteredList;
+    private Appointment appointmentToBeModified;
+    private FilteredList<Customer> customerFilteredList;
+    private Customer customerIdToBeModified;
     private Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
     @FXML
     private TableView<Customer> tblCustomer;
+    @FXML
+    private TextField txtSearchCust;
+    @FXML
+    private TextField txtSearchApp;
     @FXML
     private TableColumn<Customer, String> clmCustID;
     @FXML
@@ -51,7 +57,6 @@ public class MainPage implements Initializable {
     private TableColumn<Appointment, String> clmAppEndDate;
 
 
-    private Customer customerIdToBeModified;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -66,23 +71,17 @@ public class MainPage implements Initializable {
         clmAppStartDate.setCellValueFactory(new PropertyValueFactory<>("start"));
         clmAppEndDate.setCellValueFactory(new PropertyValueFactory<>("end"));
 
-        FilteredList<Appointment> appointmentFilteredList = new FilteredList<>(JDBCEntries.getAllAppointments(), appointment -> true);
+        appointmentFilteredList = new FilteredList<>(JDBCEntries.getAllAppointments(), appointment -> true);
         tblAppointments.setItems(appointmentFilteredList);
-        tblAppointments.getSelectionModel().selectedItemProperty().addListener((observableValue, appointment, t1) -> {
-//            if (t1 != null)
-//                if (Inventory.lookupPart(t1.getId()).getClass() == InHouse.class)
-//                    partSelectedIsInhouse = true;
-//                else
-//                    partSelectedIsInhouse = false;
-//                partSelected = Inventory.lookupPart(t1.getId());
-        });
+        tblAppointments.getSelectionModel().selectedItemProperty()
+                .addListener((observableValue, appointment, t1) -> appointmentToBeModified = t1);
         clmCustID.setCellValueFactory(new PropertyValueFactory<>("id"));
         clmCustName.setCellValueFactory(new PropertyValueFactory<>("name"));
         clmCustAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
         clmCustCity.setCellValueFactory(new PropertyValueFactory<>("city"));
         clmCustCountry.setCellValueFactory(new PropertyValueFactory<>("country"));
 
-        FilteredList<Customer> customerFilteredList = new FilteredList<>(JDBCEntries.getAllCustomers(), customer -> true);
+        customerFilteredList = new FilteredList<>(JDBCEntries.getAllCustomers(), customer -> true);
         tblCustomer.setItems(customerFilteredList);
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerIdToBeModified = t1);
@@ -173,11 +172,28 @@ public class MainPage implements Initializable {
 
     @FXML
     public void handleSearchCust() {
-
+//        customerFilteredList.setPredicate(new Predicate<>() {
+//            @Override
+//            public boolean test(Customer customer) {
+//                if (txtSearchCust.getText().isEmpty())
+//                    return true;
+//                return (customer.getName().toLowerCase().equals(txtSearchCust.getText().toLowerCase()));
+//            }
+//        });
+        customerFilteredList.setPredicate(customer -> {     // As you can see the commented out code above is the equivalent
+            if (txtSearchCust.getText().isEmpty())          // code to this lambda expression.  The code is shorter and
+                return true;                                // implements the required test method.
+            return (customer.getName().toLowerCase().equals(txtSearchCust.getText().toLowerCase()));
+        });
     }
 
     @FXML
     public void handleSearchApp() {
+        appointmentFilteredList.setPredicate(appointment -> {     // As you can see the commented out code above is the equivalent
+            if (txtSearchCust.getText().isEmpty())          // code to this lambda expression.  The code is shorter and
+                return true;                                // implements the required test method.
+            return (appointment.getTitle().toLowerCase().equals(txtSearchApp.getText().toLowerCase()));
+        });
     }
 
 
