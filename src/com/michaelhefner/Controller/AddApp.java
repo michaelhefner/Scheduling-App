@@ -21,12 +21,12 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AddApp implements Initializable {
-    private ObservableList<String> startHour = FXCollections.observableArrayList();
-    private ObservableList<String> startMin = FXCollections.observableArrayList();
-    private ObservableList<String> startAMPM = FXCollections.observableArrayList();
-    private ObservableList<String> endHour = FXCollections.observableArrayList();
-    private ObservableList<String> endMin = FXCollections.observableArrayList();
-    private ObservableList<String> endAMPM = FXCollections.observableArrayList();
+    private final ObservableList<String> startHour = FXCollections.observableArrayList();
+    private final ObservableList<String> startMin = FXCollections.observableArrayList();
+    private final ObservableList<String> startAMPM = FXCollections.observableArrayList();
+    private final ObservableList<String> endHour = FXCollections.observableArrayList();
+    private final ObservableList<String> endMin = FXCollections.observableArrayList();
+    private final ObservableList<String> endAMPM = FXCollections.observableArrayList();
 
     @FXML
     private ComboBox<String> cbStartHour;
@@ -162,6 +162,7 @@ public class AddApp implements Initializable {
 
         if (!Timeline.addTimeSlot(
                 new TimeSlot(startAppointmentDateTime, endAppointmentDateTime))) {
+            //noinspection PointlessBooleanExpression
             isValid &= false;
             showAlert("Error", "Appointment time taken", "Select 'OK' to change");
         }
@@ -327,7 +328,7 @@ public class AddApp implements Initializable {
             startHour.add(b);
             endHour.add(b);
         }
-        for (int i = 1; i < 61; i++) {
+        for (int i = 0; i < 61; i++) {
             String b = (i < 10) ? "0" + i : Integer.toString(i);
             startMin.add(b);
             endMin.add(b);
