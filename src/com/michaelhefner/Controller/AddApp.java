@@ -29,7 +29,6 @@ public class AddApp implements Initializable {
     private ObservableList<String> endHour = FXCollections.observableArrayList();
     private ObservableList<String> endMin = FXCollections.observableArrayList();
     private ObservableList<String> endAMPM = FXCollections.observableArrayList();
-    private FilteredList<Customer> customerFilteredList;
 
     @FXML
     private ComboBox<String> cbStartHour;
@@ -85,7 +84,7 @@ public class AddApp implements Initializable {
         clmCustID.setCellValueFactory(new PropertyValueFactory<>("id"));
         clmCustName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        customerFilteredList = new FilteredList<>(JDBCEntries.getAllCustomers(), customer -> true);
+        FilteredList<Customer> customerFilteredList = new FilteredList<>(JDBCEntries.getAllCustomers(), customer -> true);
         tblCustomer.setItems(customerFilteredList);
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerToAddToAppointment = t1);
@@ -94,24 +93,47 @@ public class AddApp implements Initializable {
 
     }
 
-    private void setStartAndEndDateTime() {
-        int startHourConverted = (Integer.parseInt(cbStartHour.getValue())) == 12 ? 12
-                : (Integer.parseInt(cbStartHour.getValue()) + 12);
-        int endHourConverted = (Integer.parseInt(cbEndHour.getValue())) == 12 ? 12
-                : (Integer.parseInt(cbEndHour.getValue()) + 12);
+    private boolean setStartAndEndDateTimeAndValidate() {
+        int startHourConverted;
+        int endHourConverted;
 
-        startAppointmentDateTime = (dpStart.getValue() != null) ? LocalDateTime.of(dpStart.getValue().getYear(),
-                dpStart.getValue().getMonth(),
-                dpStart.getValue().getDayOfMonth(),
-                (cbStart.getValue() == "PM") ? startHourConverted
-                        : Integer.parseInt(cbStartHour.getValue()),
-                Integer.parseInt(cbStartMin.getValue())) : null;
-        endAppointmentDateTime = (dpEnd.getValue() != null) ? LocalDateTime.of(dpEnd.getValue().getYear(),
-                dpEnd.getValue().getMonth(),
-                dpEnd.getValue().getDayOfMonth(),
-                (cbEnd.getValue() == "PM") ? endHourConverted
-                        : Integer.parseInt(cbEndHour.getValue()),
-                Integer.parseInt(cbEndMin.getValue())) : null;
+        if (cbStart.getValue().equals("PM") && !cbStartHour.getValue().equals("12"))
+            startHourConverted = Integer.parseInt(cbStartHour.getValue()) + 12;
+        else if (cbStart.getValue().equals("AM") && cbStartHour.getValue().equals("12"))
+            startHourConverted = 0;
+        else
+            startHourConverted = Integer.parseInt(cbStartHour.getValue());
+        if (cbEnd.getValue().equals("PM") && !cbEndHour.getValue().equals("12"))
+            endHourConverted = Integer.parseInt(cbEndHour.getValue()) + 12;
+        else if (cbEnd.getValue().equals("AM") && cbEndHour.getValue().equals("12"))
+            endHourConverted = 0;
+        else
+            endHourConverted = Integer.parseInt(cbEndHour.getValue());
+
+        startAppointmentDateTime = (dpStart.getValue() != null) ?
+                LocalDateTime.of(dpStart.getValue().getYear(),
+                        dpStart.getValue().getMonth(),
+                        dpStart.getValue().getDayOfMonth(),
+                        startHourConverted,
+                        Integer.parseInt(cbStartMin.getValue())) : null;
+        endAppointmentDateTime = (dpEnd.getValue() != null) ?
+                LocalDateTime.of(dpEnd.getValue().getYear(),
+                        dpEnd.getValue().getMonth(),
+                        dpEnd.getValue().getDayOfMonth(),
+                        endHourConverted,
+                        Integer.parseInt(cbEndMin.getValue())) : null;
+        if (startAppointmentDateTime.isAfter(LocalDateTime.of(startAppointmentDateTime.getYear(),
+                startAppointmentDateTime.getMonth(), startAppointmentDateTime.getDayOfMonth(),
+                8, 0)) && startAppointmentDateTime.isBefore(LocalDateTime.of(startAppointmentDateTime.getYear(),
+                startAppointmentDateTime.getMonth(), startAppointmentDateTime.getDayOfMonth(),
+                18, 0))
+        ) {
+            return true;
+        } else {
+            showAlert("Error", "Appointment time outside buiseness hours.",
+                    "Select 'OK' to change time");
+            return false;
+        }
     }
 
     private boolean validateDate() {
@@ -123,7 +145,8 @@ public class AddApp implements Initializable {
             } else {
                 dpStart.setStyle(ERROR);
                 dpEnd.setStyle(ERROR);
-                showAlert("Error", "Start date and time is before end time.", "Press 'OK' to continue.");
+                showAlert("Error", "Start date and time is before end time.",
+                        "Press 'OK' to continue.");
                 return false;
             }
         } else {
@@ -138,17 +161,18 @@ public class AddApp implements Initializable {
         boolean isValid = checkForEmptyField(new TextField[]{
                         txtLocation, txtTitle, txtType, txtUrl, txtDescription},
                 new DatePicker[]{dpStart, dpEnd}, customerToAddToAppointment);
-        setStartAndEndDateTime();
+        isValid &= setStartAndEndDateTimeAndValidate();
 
         if (!Timeline.addTimeSlot(
-                new TimeSlot(startAppointmentDateTime, endAppointmentDateTime, "Save"))) {
-            isValid = false;
+                new TimeSlot(startAppointmentDateTime, endAppointmentDateTime))) {
+            isValid &= false;
             showAlert("Error", "Appointment time taken", "Select 'OK' to change");
         }
 
-        if (validateDate() && isValid && !isModifyAppointment && customerToAddToAppointment != null) {
+        isValid &= validateDate();
+        if (isValid && !isModifyAppointment && customerToAddToAppointment != null) {
             addAppointment();
-        } else if (validateDate() && isValid && customerToAddToAppointment != null) {
+        } else if (isValid && customerToAddToAppointment != null) {
             if (updateAppointment()) {
                 Connect.closeConnection();
                 closeWindow();
@@ -161,47 +185,56 @@ public class AddApp implements Initializable {
 
 
     private void addAppointment() throws SQLException {
-        Appointment appointment = null;
+        Appointment appointment;
+        Map<Integer, Object> hashMap;
         if (customerToAddToAppointment != null) {
             appointment = new Appointment(customerToAddToAppointment.getId(),
-                    User.getId(), txtTitle.getText(), txtDescription.getText(), txtLocation.getText(), customerToAddToAppointment.getName(),
-                    txtType.getText(), txtUrl.getText(), startAppointmentDateTime, endAppointmentDateTime);
+                    User.getId(), txtTitle.getText(), txtDescription.getText(),
+                    txtLocation.getText(), customerToAddToAppointment.getName(),
+                    txtType.getText(), txtUrl.getText(), startAppointmentDateTime,
+                    endAppointmentDateTime);
+
+            hashMap = new HashMap<>();
+            hashMap.put(1, appointment.getCustomerId());
+            hashMap.put(2, appointment.getUserId());
+            hashMap.put(3, appointment.getTitle());
+            hashMap.put(4, appointment.getDescription());
+            hashMap.put(5, appointment.getLocation());
+            hashMap.put(6, appointment.getContact());
+            hashMap.put(7, appointment.getType());
+            hashMap.put(8, appointment.getUrl());
+            hashMap.put(9, appointment.getStart().toLocalDate() + " " + appointment.getStart().toLocalTime());
+            hashMap.put(10, appointment.getEnd().toLocalDate() + " " + appointment.getEnd().toLocalTime());
+            hashMap.put(11, User.getName());
+            hashMap.put(12, User.getName());
+
+            int appointmentResult = Query.executeUpdate(
+                    "INSERT INTO appointment(customerId, userId, title, description, location, " +
+                            "contact, type, url, start, end, createDate, createdBy, lastUpdateBy) " +
+                            "values(?,?,?,?,?,?,?,?,?,?,NOW(),?,?)", hashMap);
+
+            ResultSet resultSet = Query.executeQuery(
+                    "SELECT * FROM appointment", null);
+
+            while (resultSet.next())
+                if (resultSet.last())
+                    appointment.setId(resultSet.getInt("appointmentId"));
+
+            if (appointmentResult == 0) {
+                System.out.println("country result set failed to insert");
+                showAlert("Failed", "Appointment failed to save in database.",
+                        "Select 'OK' to retry");
+            } else {
+                JDBCEntries.addAppointment(appointment);
+                closeWindow();
+            }
+            Connect.closeConnection();
         }
-
-        Map<Integer, Object> hashMap = new HashMap<>();
-        hashMap.put(1, appointment.getCustomerId());
-        hashMap.put(2, appointment.getUserId());
-        hashMap.put(3, appointment.getTitle());
-        hashMap.put(4, appointment.getDescription());
-        hashMap.put(5, appointment.getLocation());
-        hashMap.put(6, appointment.getContact());
-        hashMap.put(7, appointment.getType());
-        hashMap.put(8, appointment.getUrl());
-        hashMap.put(9, appointment.getStart().toLocalDate() + " " + appointment.getStart().toLocalTime());
-        hashMap.put(10, appointment.getEnd().toLocalDate() + " " + appointment.getEnd().toLocalTime());
-        hashMap.put(11, User.getName());
-        hashMap.put(12, User.getName());
-
-
-        int appointmentResult = Query.executeUpdate("INSERT INTO appointment(customerId, userId, title, " +
-                "description, location, contact, type, url, start, end, createDate, createdBy, lastUpdateBy)" +
-                " values(?,?,?,?,?,?,?,?,?,?,NOW(),?,?)", hashMap);
-        ResultSet resultSet = Query.executeQuery("SELECT * FROM appointment", null);
-        while (resultSet.next())
-            if (resultSet.last())
-                appointment.setId(resultSet.getInt("appointmentId"));
-        if (appointmentResult == 0) {
-            System.out.println("country result set failed to insert");
-            showAlert("Failed", "Appointment failed to save in database.", "Select 'OK' to retry");
-        } else {
-            JDBCEntries.addAppointment(appointment);
-            closeWindow();
-        }
-        Connect.closeConnection();
     }
 
     public boolean updateAppointment() throws SQLException {
         int indexOfAppointment = JDBCEntries.getAllAppointments().indexOf(appointmentToModify);
+
         appointmentToModify.setTitle(txtTitle.getText());
         appointmentToModify.setType(txtType.getText());
         appointmentToModify.setUrl(txtUrl.getText());
@@ -212,6 +245,7 @@ public class AddApp implements Initializable {
         appointmentToModify.setEnd(endAppointmentDateTime);
 
         Map<Integer, Object> hashMap = new HashMap<>();
+
         hashMap.put(1, txtTitle.getText());
         hashMap.put(2, txtType.getText());
         hashMap.put(3, txtUrl.getText());
@@ -223,9 +257,10 @@ public class AddApp implements Initializable {
         hashMap.put(9, endAppointmentDateTime.toLocalDate() + " " + endAppointmentDateTime.toLocalTime());
         hashMap.put(10, appointmentToModify.getId());
 
-        int resultSet = Query.executeUpdate("UPDATE appointment set title = ?, type = ?, url = ?, " +
-                "location = ?, description = ?, contact = ?, lastUpdateBy = ?, start = ?, end = ?, lastUpdate = NOW() " +
-                "WHERE appointmentId = ?", hashMap);
+        int resultSet = Query.executeUpdate(
+                "UPDATE appointment set title = ?, type = ?, url = ?, " +
+                        "location = ?, description = ?, contact = ?, lastUpdateBy = ?, start = ?, " +
+                        "end = ?, lastUpdate = NOW() WHERE appointmentId = ?", hashMap);
 
         if (resultSet == 0)
             return false;
@@ -235,6 +270,7 @@ public class AddApp implements Initializable {
     }
 
     public void isModify(Appointment appointment) {
+        Timeline.removeTimeSlot(new TimeSlot(appointment.getStart(), appointment.getEnd()));
         txtHeading.setText("Modify Appointment");
         txtUrl.setText(appointment.getUrl());
         txtType.setText(appointment.getType());
@@ -247,15 +283,16 @@ public class AddApp implements Initializable {
         cbStartMin.setValue(Integer.toString(appointment.getStart().getMinute()));
         cbEndHour.setValue(getHour2DigitFormat(appointment.getEnd().getHour()));
         cbEndMin.setValue(Integer.toString(appointment.getStart().getMinute()));
-        customerToAddToAppointment = (Customer) JDBCEntries.getAllCustomers().filtered(customer -> customer.getName().toLowerCase().equals(appointment.getContact().toLowerCase())).get(0);
+        customerToAddToAppointment = JDBCEntries.getAllCustomers().filtered(customer ->
+                customer.getName().toLowerCase().equals(appointment.getContact().toLowerCase())).get(0);
         isModifyAppointment = true;
         appointmentToModify = appointment;
     }
 
-
     @FXML
     public void closeWindowWithAlert() {
-        if (showAlert("Cancel", "You are about to close this window", "Select OK to proceed")) {
+        if (showAlert("Cancel", "You are about to close this window",
+                "Select OK to proceed")) {
             closeWindow();
         }
     }
@@ -323,7 +360,9 @@ public class AddApp implements Initializable {
         }
     }
 
-    private boolean checkForEmptyField(TextField[] textFields, DatePicker[] datePicker, Customer customer) {
+    private boolean checkForEmptyField(TextField[] textFields,
+                                       DatePicker[] datePicker,
+                                       Customer customer) {
         boolean isValid = true;
 
         for (TextField field : textFields) {
@@ -349,7 +388,8 @@ public class AddApp implements Initializable {
             tblCustomer.setStyle(NO_ERROR);
         }
         if (!isValid)
-            showAlert("Error", "Empty fields detected", "Please fill in empty fields");
+            showAlert("Error", "Empty fields detected",
+                    "Please fill in empty fields");
         return isValid;
     }
 

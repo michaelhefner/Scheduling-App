@@ -11,6 +11,10 @@ public class Timeline {
         return dateTimeObservableList;
     }
 
+    public static void removeTimeSlot(TimeSlot timeSlot) {
+        dateTimeObservableList.remove(timeSlot);
+    }
+
     public static boolean addTimeSlot(TimeSlot timeSlotToAdd) {
         boolean isOk = true;
 

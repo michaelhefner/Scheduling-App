@@ -90,13 +90,9 @@ public class MainPage implements Initializable {
     }
 
     private void populateTimeline() {
-        for (Appointment appointment : JDBCEntries.getAllAppointments()) {
+        for (Appointment appointment : JDBCEntries.getAllAppointments())
             System.out.println(Timeline.addTimeSlot(
-                    new TimeSlot(appointment.getStart(), appointment.getEnd(), appointment.getTitle())));
-        }
-        for (TimeSlot timeSlot : Timeline.getDateTimeObservableList()) {
-            System.out.println(timeSlot.getName());
-        }
+                    new TimeSlot(appointment.getStart(), appointment.getEnd())));
     }
 
     @FXML
