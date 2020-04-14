@@ -6,7 +6,7 @@
 <?import javafx.scene.text.*?>
 <FlowPane prefHeight="566.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.michaelhefner.Controller.MainPage">
     <children>
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling System" wrappingWidth="885.0">
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling System" wrappingWidth="299.0">
             <font>
                 <Font size="24.0"/>
             </font>
@@ -14,6 +14,11 @@
                 <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
             </FlowPane.margin>
         </Text>
+        <Label fx:id="messageLabel" alignment="CENTER" prefHeight="20.0" prefWidth="577.0" textAlignment="CENTER">
+            <font>
+                <Font size="14.0"/>
+            </font>
+        </Label>
         <Label fx:id="timeLabel" alignment="CENTER" prefHeight="17.0" prefWidth="315.0" text="Time"
                textAlignment="CENTER">
             <font>

@@ -20,6 +20,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class MainPage implements Initializable {
@@ -58,6 +59,8 @@ public class MainPage implements Initializable {
     private TableColumn<Appointment, String> clmAppEndDate;
     @FXML
     private Label timeLabel;
+    @FXML
+    private Label messageLabel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -301,9 +304,32 @@ public class MainPage implements Initializable {
                     appointmentResultSet.getTimestamp("end").toLocalDateTime());
             appointment.setId(appointmentResultSet.getInt("appointmentId"));
             JDBCEntries.addAppointment(appointment);
+            checkAppTimeImenant(appointment.getStart(), appointment.getTitle());
         }
         Connect.closeConnection();
     }   //complete
+
+    private void checkAppTimeImenant(LocalDateTime start, String title) {
+        if (LocalDateTime.now().isBefore(start) && LocalDateTime.now().plusMinutes(15).isAfter(start)) {
+            showAlert("Upcoming appointment",
+                    "You have an upcoming event in " +
+                            ChronoUnit.MINUTES.between(LocalDateTime.now(), start) + " minutes",
+                    "Click 'OK' to dismiss.");
+            messageLabel.setText("Your event " + title + " in "
+                    + ChronoUnit.MINUTES.between(LocalDateTime.now(), start)
+                    + " minutes"
+            );
+        }
+    }
+
+    private Boolean showAlert(String title, String header, String context) {
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(context);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
 
     private void openStage(String stagePath, Parent parent) {
         Parent root = null;

@@ -5,11 +5,9 @@ import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -61,11 +59,11 @@ public class AddApp implements Initializable {
     @FXML
     private DatePicker dpEnd;
     @FXML
-    private TableView<Customer> tblCustomer;
-    @FXML
-    private TableColumn<Customer, String> clmCustID;
-    @FXML
-    private TableColumn<Customer, String> clmCustName;
+    private ComboBox<Customer> tblCustomer;
+//    @FXML
+//    private TableColumn<Customer, String> clmCustID;
+//    @FXML
+//    private TableColumn<Customer, String> clmCustName;
 
     private final String NO_ERROR = "-fx-border-color: rgba(25, 205, 25, 1);";
 
@@ -81,11 +79,10 @@ public class AddApp implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        clmCustID.setCellValueFactory(new PropertyValueFactory<>("id"));
-        clmCustName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        FilteredList<Customer> customerFilteredList = new FilteredList<>(JDBCEntries.getAllCustomers(), customer -> true);
-        tblCustomer.setItems(customerFilteredList);
+        tblCustomer.setVisibleRowCount(5);
+        tblCustomer.setItems(JDBCEntries.getAllCustomers());
+        tblCustomer.setPromptText("Please select a contact...");
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerToAddToAppointment = t1);
 
