@@ -1,11 +1,8 @@
 package com.michaelhefner.Controller;
 
-import com.michaelhefner.Model.Appointment;
-import com.michaelhefner.Model.Customer;
+import com.michaelhefner.Model.*;
 import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
-import com.michaelhefner.Model.JDBCEntries;
-import com.michaelhefner.Model.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -143,6 +140,11 @@ public class AddApp implements Initializable {
                 new DatePicker[]{dpStart, dpEnd}, customerToAddToAppointment);
         setStartAndEndDateTime();
 
+        if (!Timeline.addTimeSlot(
+                new TimeSlot(startAppointmentDateTime, endAppointmentDateTime, "Save"))) {
+            isValid = false;
+            showAlert("Error", "Appointment time taken", "Select 'OK' to change");
+        }
 
         if (validateDate() && isValid && !isModifyAppointment && customerToAddToAppointment != null) {
             addAppointment();

@@ -58,7 +58,7 @@
                     </font>
                 </Label>
                 <TextField fx:id="txtDescription" promptText="Description" GridPane.columnIndex="1"
-                          GridPane.columnSpan="3" GridPane.rowIndex="1">
+                           GridPane.columnSpan="3" GridPane.rowIndex="1">
                     <font>
                         <Font size="14.0"/>
                     </font>

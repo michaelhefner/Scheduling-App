@@ -62,6 +62,7 @@ public class MainPage implements Initializable {
         try {
             populateCustomerDataFromDB();
             populateAppointmentDataFromDB();
+            populateTimeline();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -86,6 +87,16 @@ public class MainPage implements Initializable {
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerIdToBeModified = t1);
 
+    }
+
+    private void populateTimeline() {
+        for (Appointment appointment : JDBCEntries.getAllAppointments()) {
+            System.out.println(Timeline.addTimeSlot(
+                    new TimeSlot(appointment.getStart(), appointment.getEnd(), appointment.getTitle())));
+        }
+        for (TimeSlot timeSlot : Timeline.getDateTimeObservableList()) {
+            System.out.println(timeSlot.getName());
+        }
     }
 
     @FXML
@@ -214,7 +225,8 @@ public class MainPage implements Initializable {
         appointmentFilteredList.setPredicate(appointment -> {     // As you can see the commented out code above is the equivalent
             if (txtSearchApp.getText().isEmpty())          // code to this lambda expression.  The code is shorter and
                 return true;                                // implements the required test method.
-            return (appointment.getTitle().toLowerCase().equals(txtSearchApp.getText().toLowerCase()));
+            return (appointment.getTitle().toLowerCase()
+                    .equals(txtSearchApp.getText().toLowerCase()));
         });
     }   //complete
 
@@ -233,7 +245,8 @@ public class MainPage implements Initializable {
             Map<Integer, Object> map = new HashMap<>();
 
             map.put(1, c.getAddressId());
-            ResultSet addressResultSet = Query.executeQuery("SELECT * FROM address where addressId = ?", map);
+            ResultSet addressResultSet =
+                    Query.executeQuery("SELECT * FROM address where addressId = ?", map);
             addressResultSet.next();
             Address address = new Address(addressResultSet.getString("address"),
                     addressResultSet.getString("address2"),
@@ -244,7 +257,8 @@ public class MainPage implements Initializable {
 
             Map<Integer, Object> cityMap = new HashMap<>();
             cityMap.put(1, c.getAddressId());
-            ResultSet cityResultSet = Query.executeQuery("SELECT * FROM city where cityId = ?", cityMap);
+            ResultSet cityResultSet =
+                    Query.executeQuery("SELECT * FROM city where cityId = ?", cityMap);
             cityResultSet.next();
             City city = new City(cityResultSet.getString("city"),
                     cityResultSet.getInt("countryId"));
@@ -253,7 +267,9 @@ public class MainPage implements Initializable {
             Map<Integer, Object> countryMap = new HashMap<>();
 
             countryMap.put(1, city.getCountryId());
-            ResultSet countryResultSet = Query.executeQuery("SELECT * FROM country where countryId = ?", countryMap);
+            ResultSet countryResultSet =
+                    Query.executeQuery("SELECT * FROM country where countryId = ?",
+                            countryMap);
             countryResultSet.next();
             Country country = new Country(countryResultSet.getString("country"));
             country.setId(countryResultSet.getInt("countryId"));
