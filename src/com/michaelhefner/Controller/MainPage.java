@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class MainPage implements Initializable {
@@ -55,10 +56,15 @@ public class MainPage implements Initializable {
     private TableColumn<Appointment, String> clmAppStartDate;
     @FXML
     private TableColumn<Appointment, String> clmAppEndDate;
-
+    @FXML
+    private Label timeLabel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        timeLabel.setText(((LocalDateTime.now().getHour() > 12) ? LocalDateTime.now().getHour() - 12
+                : LocalDateTime.now().getHour()) + ":" +
+                ((LocalDateTime.now().getMinute() < 10) ? "0" + LocalDateTime.now().getMinute()
+                        : LocalDateTime.now().getMinute()) + ((LocalDateTime.now().getHour() > 11) ? " PM" : " AM"));
         try {
             populateCustomerDataFromDB();
             populateAppointmentDataFromDB();
