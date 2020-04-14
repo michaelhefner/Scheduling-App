@@ -57,12 +57,12 @@
                         <Font size="14.0"/>
                     </font>
                 </Label>
-                <TextArea fx:id="txtDescription" promptText="Description" GridPane.columnIndex="1"
-                          GridPane.columnSpan="3" GridPane.rowIndex="1">
+                <TextField fx:id="txtDescription" promptText="Description" GridPane.columnIndex="1"
+                           GridPane.columnSpan="3" GridPane.rowIndex="1">
                     <font>
                         <Font size="14.0"/>
                     </font>
-                </TextArea>
+                </TextField>
                 <Label prefHeight="17.0" text="Location" GridPane.columnIndex="0" GridPane.rowIndex="2">
                     <font>
                         <Font size="14.0"/>

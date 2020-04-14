@@ -26,21 +26,32 @@ public class JDBCEntries {
     public static void addAppointment(Appointment appointment){
         allAppointments.add(appointment);
     }
-    public static void addCustomer(Customer customer){
+
+    public static void addCustomer(Customer customer) {
         allCustomers.add(customer);
     }
-    public static void deleteCustomer(Customer customer){
+
+    public static void deleteCustomer(Customer customer) {
         allCustomers.remove(customer);
     }
 
-    public static void updateCustomer(int index, Customer customer){
+    public static void deleteAppointment(Appointment appointment) {
+        allAppointments.remove(appointment);
+    }
+
+    public static void updateCustomer(int index, Customer customer) {
         allCustomers.set(index, customer);
     }
 
-    public static Customer lookupCustomer(Customer customer){
+    public static Customer lookupCustomer(Customer customer) {
         return allCustomers.get(allCustomers.indexOf(customer));
     }
-    public static Customer lookupCustomer(int id){
+
+    public static Customer lookupCustomer(int id) {
         return allCustomers.get(id);
+    }
+
+    public static void updateAppointment(int indexOfAppointment, Appointment appointmentToModify) {
+        allAppointments.set(indexOfAppointment, appointmentToModify);
     }
 }

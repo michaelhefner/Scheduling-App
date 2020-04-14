@@ -57,16 +57,16 @@ public class MainPage implements Initializable {
     private TableColumn<Appointment, String> clmAppEndDate;
 
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             populateCustomerDataFromDB();
+            populateAppointmentDataFromDB();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        clmAppID.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        clmAppID.setCellValueFactory(new PropertyValueFactory<>("id"));
         clmAppTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         clmAppStartDate.setCellValueFactory(new PropertyValueFactory<>("start"));
         clmAppEndDate.setCellValueFactory(new PropertyValueFactory<>("end"));
@@ -103,27 +103,49 @@ public class MainPage implements Initializable {
                 e.printStackTrace();
             }
         }
-    }
+    }   //complete
 
     @FXML
-    public void deleteApp() {
+    public void deleteApp() throws SQLException {
+        if (appointmentToBeModified != null) {
+            alert.setTitle("Delete");
+            alert.setHeaderText("You are about to delete " + appointmentToBeModified.getTitle());
+            alert.setContentText("Are you sure you would like to proceed?");
 
-    }
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+
+                Map<Integer, Object> appointmentMap = new HashMap<>();
+                appointmentMap.put(1, appointmentToBeModified.getId());
+                int updateCount = Query.executeUpdate("DELETE FROM appointment WHERE appointmentId =?", appointmentMap);
+                System.out.println("DB update count: " + updateCount);
+                JDBCEntries.deleteAppointment(appointmentToBeModified);
+                Connect.closeConnection();
+            }
+        }
+    }   //complete
 
     @FXML
-    public void openModifyApp() {
-
-    }
+    public void openModifyApp() throws IOException {
+        if (appointmentToBeModified != null) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("../View/AddApp.fxml"));
+            AnchorPane root = loader.load();
+            AddApp addApp = loader.getController();
+            addApp.isModify(appointmentToBeModified);
+            openStage(null, root);
+        }
+    }   //complete
 
     @FXML
     public void openAddCust() {
         openStage("../View/AddCust.fxml", null);
-    }
+    } //complete
 
     @FXML
     public void openAddApp() {
         openStage("../View/AddApp.fxml", null);
-    }
+    }   //complete
 
     @FXML
     public void deleteCust() throws SQLException {
@@ -155,7 +177,7 @@ public class MainPage implements Initializable {
                 Connect.closeConnection();
             }
         }
-    }
+    }   //complete
 
     @FXML
     public void openModifyCust() throws IOException {
@@ -168,7 +190,7 @@ public class MainPage implements Initializable {
             openStage(null, root);
         }
 
-    }
+    }   //complete
 
     @FXML
     public void handleSearchCust() {
@@ -185,17 +207,16 @@ public class MainPage implements Initializable {
                 return true;                                // implements the required test method.
             return (customer.getName().toLowerCase().equals(txtSearchCust.getText().toLowerCase()));
         });
-    }
+    }   //complete
 
     @FXML
     public void handleSearchApp() {
         appointmentFilteredList.setPredicate(appointment -> {     // As you can see the commented out code above is the equivalent
-            if (txtSearchCust.getText().isEmpty())          // code to this lambda expression.  The code is shorter and
+            if (txtSearchApp.getText().isEmpty())          // code to this lambda expression.  The code is shorter and
                 return true;                                // implements the required test method.
             return (appointment.getTitle().toLowerCase().equals(txtSearchApp.getText().toLowerCase()));
         });
-    }
-
+    }   //complete
 
     private void populateCustomerDataFromDB() throws SQLException {
         ArrayList<Customer> customers = new ArrayList<>();
@@ -244,7 +265,27 @@ public class MainPage implements Initializable {
             JDBCEntries.addCustomer(c);
         }
         Connect.closeConnection();
-    }
+    }   //complete
+
+    private void populateAppointmentDataFromDB() throws SQLException {
+        ResultSet appointmentResultSet = Query.executeQuery("SELECT * FROM appointment");
+        while (appointmentResultSet.next()) {
+            Appointment appointment = new Appointment(
+                    appointmentResultSet.getInt("customerId"),
+                    appointmentResultSet.getString("userId"),
+                    appointmentResultSet.getString("title"),
+                    appointmentResultSet.getString("description"),
+                    appointmentResultSet.getString("location"),
+                    appointmentResultSet.getString("contact"),
+                    appointmentResultSet.getString("type"),
+                    appointmentResultSet.getString("url"),
+                    appointmentResultSet.getTimestamp("start").toLocalDateTime(),
+                    appointmentResultSet.getTimestamp("end").toLocalDateTime());
+            appointment.setId(appointmentResultSet.getInt("appointmentId"));
+            JDBCEntries.addAppointment(appointment);
+        }
+        Connect.closeConnection();
+    }   //complete
 
     private void openStage(String stagePath, Parent parent) {
         Parent root = null;
@@ -260,5 +301,5 @@ public class MainPage implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }   //complete
 }

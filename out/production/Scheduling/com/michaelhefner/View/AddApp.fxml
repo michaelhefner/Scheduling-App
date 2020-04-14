@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <AnchorPane prefHeight="699.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.michaelhefner.Controller.AddApp">
     <children>
@@ -58,12 +57,12 @@
                         <Font size="14.0"/>
                     </font>
                 </Label>
-                <TextArea fx:id="txtDescription" promptText="Description" GridPane.columnIndex="1"
+                <TextField fx:id="txtDescription" promptText="Description" GridPane.columnIndex="1"
                           GridPane.columnSpan="3" GridPane.rowIndex="1">
                     <font>
                         <Font size="14.0"/>
                     </font>
-                </TextArea>
+                </TextField>
                 <Label prefHeight="17.0" text="Location" GridPane.columnIndex="0" GridPane.rowIndex="2">
                     <font>
                         <Font size="14.0"/>
