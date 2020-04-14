@@ -130,7 +130,7 @@ public class AddApp implements Initializable {
         ) {
             return true;
         } else {
-            showAlert("Error", "Appointment time outside buiseness hours.",
+            showAlert("Error", "Appointment time outside business hours.",
                     "Select 'OK' to change time");
             return false;
         }
