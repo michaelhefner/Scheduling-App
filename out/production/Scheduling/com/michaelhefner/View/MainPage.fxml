@@ -4,126 +4,139 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
-<AnchorPane prefHeight="800.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.michaelhefner.Controller.MainPage">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1500.0"
+            xmlns="http://javafx.com/javafx/10.0.2-internal" fx:controller="com.michaelhefner.Controller.MainPage">
     <children>
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling System" wrappingWidth="299.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling System" wrappingWidth="299.0"
+              AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
             <font>
-                <Font size="24.0" />
+                <Font size="24.0"/>
             </font>
             <FlowPane.margin>
-                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
             </FlowPane.margin>
         </Text>
-        <Text layoutX="695.0" layoutY="119.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Appointments" textAlignment="CENTER" AnchorPane.rightAnchor="442.1923828125" AnchorPane.topAnchor="99.576171875">
+        <Text layoutX="945.0" layoutY="197.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Appointments"
+              textAlignment="CENTER" AnchorPane.rightAnchor="442.1923828125" AnchorPane.topAnchor="177.576171875">
             <font>
-                <Font size="18.0" />
+                <Font size="18.0"/>
             </font>
         </Text>
-        <Label fx:id="messageLabel" alignment="CENTER" prefHeight="20.0" prefWidth="577.0" textAlignment="CENTER" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="300.0" AnchorPane.topAnchor="25.0">
+        <Label fx:id="messageLabel" alignment="CENTER" prefHeight="20.0" prefWidth="577.0" textAlignment="CENTER"
+               AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="300.0" AnchorPane.topAnchor="25.0">
             <font>
-                <Font size="14.0" />
+                <Font size="14.0"/>
             </font>
         </Label>
-        <Button fx:id="btnSearchApp" mnemonicParsing="false" onAction="#handleSearchApp" text="Search" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="100.0" />
-        <TextField fx:id="txtSearchApp" promptText="Search" AnchorPane.rightAnchor="110.0" AnchorPane.topAnchor="100.0" />
-        <TableView fx:id="tblAppointments" prefHeight="150.0" prefWidth="525.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="130.0">
+        <Button fx:id="btnSearchApp" layoutX="1418.0" layoutY="178.0" mnemonicParsing="false"
+                onAction="#handleSearchApp" text="Search" AnchorPane.rightAnchor="30.5" AnchorPane.topAnchor="178.0"/>
+        <TextField fx:id="txtSearchApp" layoutX="1269.0" layoutY="178.0" promptText="Search Title"
+                   AnchorPane.rightAnchor="82.0" AnchorPane.topAnchor="178.0"/>
+        <TableView fx:id="tblAppointments" layoutX="945.0" layoutY="203.0" prefHeight="150.0" prefWidth="525.0"
+                   AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="203.0">
             <columns>
-                <TableColumn fx:id="clmAppID" prefWidth="125.0" text="Appointment ID" />
-                <TableColumn fx:id="clmAppTitle" prefWidth="125.0" text="Title" />
-                <TableColumn fx:id="clmAppStartDate" prefWidth="125.0" text="Start Date" />
-                <TableColumn fx:id="clmAppEndDate" prefWidth="125.0" text="End Date" />
+                <TableColumn fx:id="clmAppID" prefWidth="125.0" text="Appointment ID"/>
+                <TableColumn fx:id="clmAppTitle" prefWidth="125.0" text="Title"/>
+                <TableColumn fx:id="clmAppStartDate" prefWidth="125.0" text="Start Date"/>
+                <TableColumn fx:id="clmAppEndDate" prefWidth="125.0" text="End Date"/>
             </columns>
         </TableView>
-        <Text layoutX="695.0" layoutY="389.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer" textAlignment="CENTER" AnchorPane.rightAnchor="478.2099609375" AnchorPane.topAnchor="369.576171875">
+        <Text layoutX="945.0" layoutY="494.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer"
+              textAlignment="CENTER" AnchorPane.rightAnchor="478.2099609375" AnchorPane.topAnchor="474.576171875">
             <font>
-                <Font size="18.0" />
+                <Font size="18.0"/>
             </font>
         </Text>
-        <HBox alignment="CENTER_RIGHT" prefHeight="47.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="280.0">
+        <HBox alignment="CENTER_RIGHT" prefHeight="47.0" AnchorPane.bottomAnchor="400.0" AnchorPane.rightAnchor="30.0">
             <children>
                 <Button fx:id="btnAddApp" mnemonicParsing="false" onAction="#openAddApp" text="Add">
                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </HBox.margin>
                 </Button>
                 <Button fx:id="btnModifyApp" mnemonicParsing="false" onAction="#openModifyApp" text="Modify">
                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </HBox.margin>
                 </Button>
                 <Button fx:id="btnDeleteApp" mnemonicParsing="false" onAction="#deleteApp" text="Delete">
                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </HBox.margin>
                 </Button>
             </children>
         </HBox>
-        <TableView fx:id="tblCustomer" prefHeight="150.0" prefWidth="525.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="400.0">
+        <TableView fx:id="tblCustomer" prefHeight="150.0" prefWidth="525.0" AnchorPane.bottomAnchor="150.0"
+                   AnchorPane.rightAnchor="30.0">
             <columns>
-                <TableColumn fx:id="clmCustID" prefWidth="30" text="ID" />
-                <TableColumn fx:id="clmCustName" prefWidth="140" text="Name" />
-                <TableColumn fx:id="clmCustAddress" prefWidth="140" text="Address" />
-                <TableColumn fx:id="clmCustCity" prefWidth="140" text="City" />
-                <TableColumn fx:id="clmCustCountry" prefWidth="60" text="Country" />
+                <TableColumn fx:id="clmCustID" prefWidth="30" text="ID"/>
+                <TableColumn fx:id="clmCustName" prefWidth="140" text="Name"/>
+                <TableColumn fx:id="clmCustAddress" prefWidth="140" text="Address"/>
+                <TableColumn fx:id="clmCustCity" prefWidth="140" text="City"/>
+                <TableColumn fx:id="clmCustCountry" prefWidth="60" text="Country"/>
             </columns>
             <rowFactory>
 
             </rowFactory>
         </TableView>
-        <HBox alignment="CENTER_RIGHT" prefHeight="47.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="550.0">
+        <HBox alignment="CENTER_RIGHT" prefHeight="47.0" AnchorPane.bottomAnchor="100.0" AnchorPane.rightAnchor="30.0">
             <children>
                 <Button fx:id="btnAddCust" mnemonicParsing="false" onAction="#openAddCust" text="Add">
                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </HBox.margin>
                 </Button>
                 <Button fx:id="btnModifyCust" mnemonicParsing="false" onAction="#openModifyCust" text="Modify">
                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </HBox.margin>
                 </Button>
                 <Button fx:id="btnDeleteCust" mnemonicParsing="false" onAction="#deleteCust" text="Delete">
                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </HBox.margin>
                 </Button>
             </children>
         </HBox>
-        <TextField fx:id="txtSearchCust" promptText="Search" AnchorPane.rightAnchor="110.0" AnchorPane.topAnchor="370.0" />
-        <Button fx:id="btnSearchCust" mnemonicParsing="false" onAction="#handleSearchCust" text="Search" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="370.0" />
-        <FlowPane prefHeight="24.0" prefWidth="484.0" prefWrapLength="480.0" />
-        <Button fx:id="btnExit" mnemonicParsing="false" onAction="#onExit" text="Exit" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="30.0">
+        <TextField fx:id="txtSearchCust" layoutX="1269.0" layoutY="475.0" promptText="Search Name"
+                   AnchorPane.rightAnchor="82.0" AnchorPane.topAnchor="475.0"/>
+        <Button fx:id="btnSearchCust" layoutX="1418.0" layoutY="475.0" mnemonicParsing="false"
+                onAction="#handleSearchCust" text="Search" AnchorPane.rightAnchor="30.5" AnchorPane.topAnchor="475.0"/>
+        <FlowPane prefHeight="24.0" prefWidth="484.0" prefWrapLength="480.0"/>
+        <Button fx:id="btnExit" mnemonicParsing="false" onAction="#onExit" text="Exit" AnchorPane.bottomAnchor="30.0"
+                AnchorPane.rightAnchor="30.0">
             <font>
-                <Font size="14.0" />
+                <Font size="14.0"/>
             </font>
         </Button>
-        <TableView fx:id="tblCalendarMonth" editable="true" layoutX="15.0" layoutY="90.0" prefHeight="460.0" prefWidth="915.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="160.0">
+        <TableView fx:id="tblCalendarMonth" editable="true" layoutX="15.0" layoutY="90.0" prefHeight="460.0"
+                   prefWidth="915.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="15.0"
+                   AnchorPane.topAnchor="160.0">
             <columns>
-                <TableColumn fx:id="clmStartDate" prefWidth="65.0" text="Start Day" />
-                <TableColumn fx:id="clmStartTime" prefWidth="100.0" text="Start Time" />
-                <TableColumn fx:id="clmEndDate" prefWidth="65.0" text="End Day" />
-                <TableColumn fx:id="clmEndTime" prefWidth="100.0" text="End Time" />
-                <TableColumn fx:id="clmTitle" prefWidth="125.0" text="Title" />
-                <TableColumn fx:id="clmDescription" prefWidth="175.0" text="Description" />
-                <TableColumn fx:id="clmLocation" prefWidth="150.0" text="Location" />
-                <TableColumn fx:id="clmContact" prefWidth="125.0" text="Contact" />
+                <TableColumn fx:id="clmStartDate" prefWidth="65.0" text="Start Day"/>
+                <TableColumn fx:id="clmStartTime" prefWidth="100.0" text="Start Time"/>
+                <TableColumn fx:id="clmEndDate" prefWidth="65.0" text="End Day"/>
+                <TableColumn fx:id="clmEndTime" prefWidth="100.0" text="End Time"/>
+                <TableColumn fx:id="clmTitle" prefWidth="125.0" text="Title"/>
+                <TableColumn fx:id="clmDescription" prefWidth="175.0" text="Description"/>
+                <TableColumn fx:id="clmLocation" prefWidth="150.0" text="Location"/>
+                <TableColumn fx:id="clmContact" prefWidth="125.0" text="Contact"/>
             </columns>
         </TableView>
         <Label fx:id="lblMonth" layoutX="443.0" layoutY="80.0" text="Month">
             <font>
-                <Font size="28.0" />
+                <Font size="28.0"/>
             </font>
         </Label>
-      <Label layoutX="15.0" layoutY="139.0" text="Filter by:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <ComboBox fx:id="cbDurationFilter" layoutX="90.0" layoutY="135.0" prefWidth="150.0" promptText="Duration" />
-      <ComboBox fx:id="cbContactFilter" layoutX="239.0" layoutY="135.0" prefWidth="150.0" promptText="Contact" />
+        <Label layoutX="15.0" layoutY="139.0" text="Filter by:">
+            <font>
+                <Font size="14.0"/>
+            </font>
+        </Label>
+        <ComboBox fx:id="cbDurationFilter" layoutX="90.0" layoutY="135.0" prefWidth="150.0" promptText="Duration"/>
+        <ComboBox fx:id="cbContactFilter" layoutX="239.0" layoutY="135.0" prefWidth="150.0" promptText="Contact"/>
     </children>
     <opaqueInsets>
-        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
     </opaqueInsets>
 </AnchorPane>

@@ -90,8 +90,8 @@ public class MainPage implements Initializable {
     private ComboBox<String> cbDurationFilter;
     @FXML
     private ComboBox<String> cbContactFilter;
-    private ObservableList<String> durationFilter = FXCollections.observableArrayList();
-    private ObservableList<String> customerFilter = FXCollections.observableArrayList();
+    private ObservableList<String> durationList = FXCollections.observableArrayList();
+    private ObservableList<String> customerList = FXCollections.observableArrayList();
     private String durationFilterSelection;
 
     @Override
@@ -127,15 +127,19 @@ public class MainPage implements Initializable {
     }
 
     private void setTblCalendarMonth() {
-        durationFilter.add("Day");
-        durationFilter.add("Week");
-        durationFilter.add("Month");
-        cbDurationFilter.setItems(durationFilter);
+        durationList.add(null);
+        durationList.add("Day");
+        durationList.add("Week");
+        durationList.add("Month");
+        cbDurationFilter.setItems(durationList);
         FilteredList<Appointment> thisMonthsAppointments = JDBCEntries.getAllAppointments().filtered(appointment -> {
             return appointment.getStart().getMonth().equals(LocalDate.now().getMonth());
         });
+
+        FilteredList<Appointment> durationFilter = thisMonthsAppointments;
+
         cbDurationFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) -> {
-            thisMonthsAppointments.setPredicate(appointment -> {
+            durationFilter.setPredicate(appointment -> {
                 if (t1 != (null))
                     if (t1.equals("Day"))
                         return (appointment.getStart().getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < 2);
@@ -145,13 +149,15 @@ public class MainPage implements Initializable {
             });
         });
 
-        customerFilter.add(null);
+        customerList.add(null);
         for (Customer customer : JDBCEntries.getAllCustomers())
-            customerFilter.add(customer.getName());
-        cbContactFilter.setItems(customerFilter);
+            customerList.add(customer.getName());
+        cbContactFilter.setItems(customerList);
+
+        FilteredList<Appointment> customerList = durationFilter;
 
         cbContactFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) -> {
-            thisMonthsAppointments.setPredicate(appointment -> {
+            customerList.setPredicate(appointment -> {
                 if (t1 != (null))
                     return (appointment.getContact().equals(t1));
                 return true;
