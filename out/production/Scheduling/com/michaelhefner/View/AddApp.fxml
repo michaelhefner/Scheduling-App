@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
-<AnchorPane prefHeight="699.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.michaelhefner.Controller.AddApp">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="699.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" fx:controller="com.michaelhefner.Controller.AddApp">
     <children>
         <Text fx:id="txtHeading" strokeType="OUTSIDE" strokeWidth="0.0" text="Add Appointment" textAlignment="CENTER" wrappingWidth="600.0000029802322" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <font>

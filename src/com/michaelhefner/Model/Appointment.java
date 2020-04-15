@@ -35,12 +35,12 @@ public class Appointment {
         setEnd(end);
         setStartDate(start.toLocalDate());
         setStartTime(start.toLocalTime());
-        setEndDate(start.toLocalDate());
-        setEndTime(start.toLocalTime());
+        setEndDate(end.toLocalDate());
+        setEndTime(end.toLocalTime());
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public String getStartDate() {
+        return Integer.toString(startDate.getDayOfMonth());
     }
 
     public void setStartDate(LocalDate startDate) {
@@ -55,8 +55,8 @@ public class Appointment {
         this.startTime = startTime;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public String getEndDate() {
+        return Integer.toString(endDate.getDayOfMonth());
     }
 
     public void setEndDate(LocalDate endDate) {

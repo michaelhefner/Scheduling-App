@@ -3,7 +3,6 @@ package com.michaelhefner.Controller;
 import com.michaelhefner.Model.*;
 import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
-import com.michaelhefner.Model.Time.Day;
 import com.michaelhefner.Model.Time.TimeSlot;
 import com.michaelhefner.Model.Time.Timeline;
 import javafx.application.Platform;
@@ -65,39 +64,35 @@ public class MainPage implements Initializable {
     private TableColumn<Appointment, String> clmAppEndDate;
     @FXML
     private Label messageLabel;
-    //
-//    @FXML
-//    private TableView<Day> tblCalendarMonth;
-//    @FXML
-//    private TableColumn<Day, String> clmDayOfMonth;
-//    @FXML
-//    private TableColumn<Day, String> clmMonday;
-//    @FXML
-//    private TableColumn<Day, String> clmTuesday;
-//    @FXML
-//    private TableColumn<Day, String> clmWednesday;
-//    @FXML
-//    private TableColumn<Day, String> clmThursday;
-//    @FXML
-//    private TableColumn<Day, String> clmFriday;
-//    @FXML
-//    private TableColumn<Day, String> clmSaturday;
     @FXML
     private TableView<Appointment> tblCalendarMonth;
     @FXML
     private TableColumn<Appointment, String> clmDayOfMonth;
     @FXML
-    private TableColumn<Appointment, String> clmMonday;
+    private TableColumn<Appointment, String> clmTitle;
     @FXML
-    private TableColumn<Appointment, String> clmTuesday;
+    private TableColumn<Appointment, String> clmStartDate;
     @FXML
-    private TableColumn<Appointment, String> clmWednesday;
+    private TableColumn<Appointment, String> clmStartTime;
     @FXML
-    private TableColumn<Appointment, String> clmThursday;
+    private TableColumn<Appointment, String> clmEndDate;
     @FXML
-    private TableColumn<Appointment, String> clmFriday;
+    private TableColumn<Appointment, String> clmEndTime;
     @FXML
-    private TableColumn<Appointment, String> clmSaturday;
+    private TableColumn<Appointment, String> clmContact;
+    @FXML
+    private TableColumn<Appointment, String> clmDescription;
+    @FXML
+    private TableColumn<Appointment, String> clmLocation;
+    @FXML
+    private Label lblMonth;
+    @FXML
+    private ComboBox<String> cbDurationFilter;
+    @FXML
+    private ComboBox<String> cbContactFilter;
+    private ObservableList<String> durationFilter = FXCollections.observableArrayList();
+    private ObservableList<String> customerFilter = FXCollections.observableArrayList();
+    private String durationFilterSelection;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -105,6 +100,7 @@ public class MainPage implements Initializable {
             populateCustomerDataFromDB();
             populateAppointmentDataFromDB();
             populateTimeline();
+            setTblCalendarMonth();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -128,27 +124,48 @@ public class MainPage implements Initializable {
         tblCustomer.setItems(customerFilteredList);
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerIdToBeModified = t1);
+    }
 
-        ObservableList<Appointment> thisMonthsAppointments = JDBCEntries.getAllAppointments().filtered(appointment -> {
+    private void setTblCalendarMonth() {
+        durationFilter.add("Day");
+        durationFilter.add("Week");
+        durationFilter.add("Month");
+        cbDurationFilter.setItems(durationFilter);
+        FilteredList<Appointment> thisMonthsAppointments = JDBCEntries.getAllAppointments().filtered(appointment -> {
             return appointment.getStart().getMonth().equals(LocalDate.now().getMonth());
         });
+        cbDurationFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) -> {
+            thisMonthsAppointments.setPredicate(appointment -> {
+                if (t1 != (null))
+                    if (t1.equals("Day"))
+                        return (appointment.getStart().getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < 2);
+                    else if (t1.equals("Week"))
+                        return (appointment.getStart().getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < 8);
+                return true;
+            });
+        });
 
-        ObservableList<Day> days = FXCollections.observableArrayList();
+        customerFilter.add(null);
+        for (Customer customer : JDBCEntries.getAllCustomers())
+            customerFilter.add(customer.getName());
+        cbContactFilter.setItems(customerFilter);
 
-        LocalDate localDate = LocalDate.now();
-        for (int i = 0; i <= localDate.lengthOfMonth() - localDate.getDayOfMonth(); i++) {
-
-            days.add(new Day(localDate.plusDays(i).getDayOfWeek().toString(), localDate.plusDays(i).getDayOfMonth()));
-        }
-
-        clmDayOfMonth.setCellValueFactory(new PropertyValueFactory<>("id"));
-        clmMonday.setCellValueFactory(new PropertyValueFactory<>("title"));
-        clmTuesday.setCellValueFactory(new PropertyValueFactory<>("startDate"));
-        clmWednesday.setCellValueFactory(new PropertyValueFactory<>("startTime"));
-        clmThursday.setCellValueFactory(new PropertyValueFactory<>("endDate"));
-        clmFriday.setCellValueFactory(new PropertyValueFactory<>("endTime"));
-        clmSaturday.setCellValueFactory(new PropertyValueFactory<>("contact"));
-//        ObservableList<Day> days = FXCollections.observableArrayList();
+        cbContactFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) -> {
+            thisMonthsAppointments.setPredicate(appointment -> {
+                if (t1 != (null))
+                    return (appointment.getContact().equals(t1));
+                return true;
+            });
+        });
+        lblMonth.setText(LocalDate.now().getMonth().toString());
+        clmTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        clmStartDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        clmStartTime.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+        clmEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
+        clmEndTime.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+        clmContact.setCellValueFactory(new PropertyValueFactory<>("contact"));
+        clmDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+        clmLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
         tblCalendarMonth.setItems(thisMonthsAppointments);
     }
 
