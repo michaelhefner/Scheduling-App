@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -34,7 +35,7 @@ public class MainPage implements Initializable {
     private Appointment appointmentToBeModified;
     private FilteredList<Customer> customerFilteredList;
     private Customer customerIdToBeModified;
-    private Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    private final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
     @FXML
     private TableView<Customer> tblCustomer;
@@ -67,8 +68,6 @@ public class MainPage implements Initializable {
     @FXML
     private TableView<Appointment> tblCalendarMonth;
     @FXML
-    private TableColumn<Appointment, String> clmDayOfMonth;
-    @FXML
     private TableColumn<Appointment, String> clmTitle;
     @FXML
     private TableColumn<Appointment, String> clmStartDate;
@@ -90,9 +89,10 @@ public class MainPage implements Initializable {
     private ComboBox<String> cbDurationFilter;
     @FXML
     private ComboBox<String> cbContactFilter;
-    private ObservableList<String> durationList = FXCollections.observableArrayList();
-    private ObservableList<String> customerList = FXCollections.observableArrayList();
-    private String durationFilterSelection;
+    private final ObservableList<String> durationList = FXCollections.observableArrayList();
+    private final ObservableList<String> customerList = FXCollections.observableArrayList();
+    @FXML
+    private Button btnClearFilters;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -132,37 +132,38 @@ public class MainPage implements Initializable {
         durationList.add("Week");
         durationList.add("Month");
         cbDurationFilter.setItems(durationList);
-        FilteredList<Appointment> thisMonthsAppointments = JDBCEntries.getAllAppointments().filtered(appointment -> {
-            return appointment.getStart().getMonth().equals(LocalDate.now().getMonth());
-        });
+        SortedList<Appointment> sortedList = new SortedList<>(JDBCEntries.getAllAppointments(),
+                (Appointment appointment, Appointment appointment2) -> {
+                    if (appointment.getStart().isBefore(appointment2.getStart()))
+                        return -1;
+                    else if (appointment.getStart().isAfter(appointment2.getStart()))
+                        return 1;
+                    return 0;
+                });
+        FilteredList<Appointment> thisMonthsAppointments = sortedList.filtered(appointment ->
+                appointment.getStart().getMonth().equals(LocalDate.now().getMonth()));
 
-        FilteredList<Appointment> durationFilter = thisMonthsAppointments;
-
-        cbDurationFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) -> {
-            durationFilter.setPredicate(appointment -> {
-                if (t1 != (null))
-                    if (t1.equals("Day"))
-                        return (appointment.getStart().getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < 2);
-                    else if (t1.equals("Week"))
-                        return (appointment.getStart().getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < 8);
-                return true;
-            });
-        });
+        cbDurationFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) ->
+                thisMonthsAppointments.setPredicate(appointment -> {
+                    if (t1 != (null))
+                        if (t1.equals("Day"))
+                            return (appointment.getStart().getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < 2);
+                        else if (t1.equals("Week"))
+                            return (appointment.getStart().getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < 8);
+                    return true;
+                }));
 
         customerList.add(null);
         for (Customer customer : JDBCEntries.getAllCustomers())
             customerList.add(customer.getName());
         cbContactFilter.setItems(customerList);
 
-        FilteredList<Appointment> customerList = durationFilter;
-
-        cbContactFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) -> {
-            customerList.setPredicate(appointment -> {
-                if (t1 != (null))
-                    return (appointment.getContact().equals(t1));
-                return true;
-            });
-        });
+        cbContactFilter.getSelectionModel().selectedItemProperty().addListener((observableValue, s, t1) ->
+                thisMonthsAppointments.setPredicate(appointment -> {
+                    if (t1 != (null))
+                        return (appointment.getContact().equals(t1));
+                    return true;
+                }));
         lblMonth.setText(LocalDate.now().getMonth().toString());
         clmTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         clmStartDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
@@ -173,6 +174,11 @@ public class MainPage implements Initializable {
         clmDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         clmLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
         tblCalendarMonth.setItems(thisMonthsAppointments);
+        btnClearFilters.setOnAction(e -> {
+            cbContactFilter.getSelectionModel().clearSelection();
+            cbDurationFilter.getSelectionModel().clearSelection();
+            thisMonthsAppointments.setPredicate(appointment -> true);
+        });
     }
 
     @FXML
@@ -190,7 +196,7 @@ public class MainPage implements Initializable {
                 e.printStackTrace();
             }
         }
-    }   //complete
+    }
 
     @FXML
     public void openModifyApp() throws IOException {
@@ -202,30 +208,34 @@ public class MainPage implements Initializable {
             addApp.isModify(appointmentToBeModified);
             openStage(null, root);
         }
-    }   //complete
+    }
 
     @FXML
     public void openAddCust() {
         openStage("../View/AddCust.fxml", null);
-    } //complete
+    }
 
     @FXML
     public void openAddApp() {
         openStage("../View/AddApp.fxml", null);
-    }   //complete
+    }
 
     @FXML
-    public void openModifyCust() throws IOException {
-        if (customerIdToBeModified != null) {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("../View/AddCust.fxml"));
-            AnchorPane root = loader.load();
-            AddCust addCust = loader.getController();
-            addCust.isModify(customerIdToBeModified);
-            openStage(null, root);
+    public void openModifyCust() {
+        try {
+            if (customerIdToBeModified != null) {
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("../View/AddCust.fxml"));
+                AnchorPane root;
+                root = loader.load();
+                AddCust addCust = loader.getController();
+                addCust.isModify(customerIdToBeModified);
+                openStage(null, root);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-    }   //complete
+    }
 
     @FXML
     public void deleteCust() throws SQLException {
@@ -257,7 +267,7 @@ public class MainPage implements Initializable {
                 Connect.closeConnection();
             }
         }
-    }   //complete
+    }
 
     @FXML
     public void deleteApp() throws SQLException {
@@ -277,7 +287,7 @@ public class MainPage implements Initializable {
                 Connect.closeConnection();
             }
         }
-    }   //complete
+    }
 
     @FXML
     public void handleSearchCust() {
@@ -294,7 +304,7 @@ public class MainPage implements Initializable {
                 return true;                                // implements the required test method.
             return (customer.getName().toLowerCase().equals(txtSearchCust.getText().toLowerCase()));
         });
-    }   //complete
+    }
 
     @FXML
     public void handleSearchApp() {
@@ -304,7 +314,7 @@ public class MainPage implements Initializable {
             return (appointment.getTitle().toLowerCase()
                     .equals(txtSearchApp.getText().toLowerCase()));
         });
-    }   //complete
+    }
 
     private void populateTimeline() {
         for (Appointment appointment : JDBCEntries.getAllAppointments())
@@ -363,7 +373,7 @@ public class MainPage implements Initializable {
             JDBCEntries.addCustomer(c);
         }
         Connect.closeConnection();
-    }   //complete
+    }
 
     private void populateAppointmentDataFromDB() throws SQLException {
         ResultSet appointmentResultSet = Query.executeQuery("SELECT * FROM appointment");
@@ -384,14 +394,14 @@ public class MainPage implements Initializable {
             checkAppTimeEminent(appointment.getStart(), appointment.getTitle());
         }
         Connect.closeConnection();
-    }   //complete
+    }
 
     private void checkAppTimeEminent(LocalDateTime start, String title) {
         if (LocalDateTime.now().isBefore(start) && LocalDateTime.now().plusMinutes(15).isAfter(start)) {
-            showAlert("Upcoming appointment",
+            showAlert(
                     "You have an upcoming event in " +
-                            ChronoUnit.MINUTES.between(LocalDateTime.now(), start) + " minutes",
-                    "Click 'OK' to dismiss.");
+                            ChronoUnit.MINUTES.between(LocalDateTime.now(), start) + " minutes"
+            );
             messageLabel.setText("Your event " + title + " in "
                     + ChronoUnit.MINUTES.between(LocalDateTime.now(), start)
                     + " minutes"
@@ -399,13 +409,11 @@ public class MainPage implements Initializable {
         }
     }
 
-    private Boolean showAlert(String title, String header, String context) {
-        alert.setTitle(title);
+    private void showAlert(String header) {
+        alert.setTitle("Upcoming appointment");
         alert.setHeaderText(header);
-        alert.setContentText(context);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
+        alert.setContentText("Click 'OK' to dismiss.");
+        alert.showAndWait();
     }
 
     private void openStage(String stagePath, Parent parent) {
@@ -422,5 +430,6 @@ public class MainPage implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }   //complete
+    }
+
 }

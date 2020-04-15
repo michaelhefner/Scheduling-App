@@ -109,14 +109,12 @@ public class Login implements Initializable {
     public boolean verifyLogin() throws SQLException {
         boolean isValid = false;
         User.setName(txtUsername.getText().toLowerCase());
-        System.out.println("username entered = " + User.getName());
 
         Map<Integer, Object> mapList = new HashMap<>();
         mapList.put(1, User.getName());
         ResultSet resultSet = Query.executeQuery("SELECT * FROM user where userName = ?", mapList);
 
         if (resultSet.next()) {
-            System.out.println("User found");
             User.setPassword(resultSet.getString("password"));
             if (txtPassword.getText().compareTo(User.getPassword()) == 0) {
                 addMessage(correctAuth);
@@ -130,7 +128,6 @@ public class Login implements Initializable {
                 lblError.setText(incorrectAuth);
             }
         } else {
-            System.out.println(noUserFound);
             addMessage(noUserFound);
             lblError.setText(noUserFound);
         }
@@ -141,8 +138,6 @@ public class Login implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
-
         resourceBundle = ResourceBundle.getBundle("com.michaelhefner/Nat", Locale.getDefault());
         if (Locale.getDefault().getLanguage().equals("es")
                 || Locale.getDefault().getLanguage().equals("fr")

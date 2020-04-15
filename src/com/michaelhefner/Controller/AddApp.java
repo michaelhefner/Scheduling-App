@@ -46,10 +46,6 @@ public class AddApp implements Initializable {
     @FXML
     private ComboBox<String> cbStart;
     @FXML
-    private TextField txtStartTime;
-    @FXML
-    private TextField txtEndTime;
-    @FXML
     private Button btnCancel;
     @FXML
     private Text txtHeading;

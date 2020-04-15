@@ -52,7 +52,8 @@ public class AddCust implements Initializable {
 
     @FXML
     public void closeWindowWithAlert() {
-        if (showAlert("Cancel", "You are about to close this window", "Select OK to proceed")) {
+        if (showAlert("Cancel", "You are about to close this window",
+                "Select OK to proceed")) {
             closeWindow();
         }
     }
@@ -105,10 +106,9 @@ public class AddCust implements Initializable {
         hashMap.put(4, User.getName());
         hashMap.put(5, User.getName());
 
-        int customerResultSet = Query.executeUpdate("INSERT INTO customer(customerName, addressId, active, " +
-                "createDate, createdBy, lastUpdateBy) values(?,?,?,NOW(),?,?)", hashMap);
+        int customerResultSet = Query.executeUpdate("INSERT INTO customer(customerName, " +
+                "addressId, active, createDate, createdBy, lastUpdateBy) values(?,?,?,NOW(),?,?)", hashMap);
 
-        System.out.println("customer result set = " + customerResultSet);
         ResultSet resultSet = Query.executeQuery("SELECT * FROM customer", null);
         if (customerResultSet == 0) {
             System.out.println("country result set failed to insert");
@@ -122,7 +122,6 @@ public class AddCust implements Initializable {
             customer.setId(customerId);
         else
             Connect.closeConnection();
-        System.out.println("customer id = " + customer.getId());
         return customer;
     }
 
@@ -146,7 +145,6 @@ public class AddCust implements Initializable {
                 "INSERT INTO address(address, address2, cityId, postalCode, phone, " +
                         "createDate, createdBy, lastUpdateBy) values(?,?,?,?,?,NOW(),?,?)", hashMap);
 
-        System.out.println("address result set = " + addressResultSet);
         ResultSet resultSet = Query.executeQuery("SELECT * FROM address", null);
         if (addressResultSet == 0) {
             System.out.println("address result set failed to insert");
@@ -160,7 +158,6 @@ public class AddCust implements Initializable {
             address.setId(addressId);
         else
             Connect.closeConnection();
-        System.out.println("address id = " + address.getId());
         return address;
     }
 
@@ -176,7 +173,6 @@ public class AddCust implements Initializable {
         int countryResultSet = Query.executeUpdate("INSERT INTO city(city, countryId, createDate, " +
                 "createdBy, lastUpdateBy) values(?,?,NOW(),?,?)", hashMap);
 
-        System.out.println("country result = " + countryResultSet);
         ResultSet resultSet = Query.executeQuery("SELECT * FROM city", null);
         if (countryResultSet == 0) {
             System.out.println("country result set failed to insert");
@@ -190,7 +186,6 @@ public class AddCust implements Initializable {
             city.setId(cityId);
         else
             Connect.closeConnection();
-        System.out.println("city id = " + city.getId());
         return city;
     }
 
@@ -217,7 +212,6 @@ public class AddCust implements Initializable {
             country.setId(countryId);
         else
             Connect.closeConnection();
-        System.out.println("country id = " + country.getId());
         return country;
     }
 
@@ -236,8 +230,8 @@ public class AddCust implements Initializable {
         hashMap.put(2, User.getName());
         hashMap.put(3, customerToModify.getCountry().getId());
 
-        int resultSet = Query.executeUpdate("UPDATE country set country = ?, lastUpdateBy = ?, lastUpdate = NOW() " +
-                "WHERE countryId = ?", hashMap);
+        int resultSet = Query.executeUpdate("UPDATE country set country = ?, lastUpdateBy = ?, " +
+                "lastUpdate = NOW() WHERE countryId = ?", hashMap);
 
         if (resultSet == 0)
             return false;
@@ -247,8 +241,8 @@ public class AddCust implements Initializable {
         hashMap.put(2, User.getName());
         hashMap.put(3, customerToModify.getCity().getId());
 
-        resultSet = Query.executeUpdate("UPDATE city SET city = ?, lastUpdateBy = ?, lastUpdate = NOW() " +
-                "WHERE cityId = ?", hashMap);
+        resultSet = Query.executeUpdate("UPDATE city SET city = ?, lastUpdateBy = ?, lastUpdate " +
+                "= NOW() WHERE cityId = ?", hashMap);
 
         if (resultSet == 0)
             return false;
@@ -261,8 +255,8 @@ public class AddCust implements Initializable {
         hashMap.put(5, User.getName());
         hashMap.put(6, customerToModify.getAddress().getId());
 
-        resultSet = Query.executeUpdate("UPDATE address SET address = ?, address2 = ?, phone = ?, postalCode = ?, " +
-                "lastUpdateBy = ?, lastUpdate = NOW() WHERE addressId = ?", hashMap);
+        resultSet = Query.executeUpdate("UPDATE address SET address = ?, address2 = ?, phone = ?" +
+                ", postalCode = ?, lastUpdateBy = ?, lastUpdate = NOW() WHERE addressId = ?", hashMap);
 
         if (resultSet == 0)
             return false;

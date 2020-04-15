@@ -135,6 +135,11 @@
         </Label>
         <ComboBox fx:id="cbDurationFilter" layoutX="90.0" layoutY="135.0" prefWidth="150.0" promptText="Duration"/>
         <ComboBox fx:id="cbContactFilter" layoutX="239.0" layoutY="135.0" prefWidth="150.0" promptText="Contact"/>
+        <Button fx:id="btnClearFilters" layoutX="389.0" layoutY="135.0" mnemonicParsing="false" text="Clear Filters">
+            <padding>
+                <Insets bottom="4.0" left="25.0" right="25.0" top="4.0"/>
+            </padding>
+        </Button>
     </children>
     <opaqueInsets>
         <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
