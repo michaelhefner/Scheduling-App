@@ -78,7 +78,7 @@ public class AddCust implements Initializable {
                 customer.setAddress(address);
                 if (customer.getId() > 0) {
                     Connect.closeConnection();
-                    JDBCEntries.addCustomer(customer);
+                    ScheduleEntries.addCustomer(customer);
                     closeWindow();
                 } else {
                     showAlert("Error", "There was an error uploading information to database",
@@ -216,7 +216,7 @@ public class AddCust implements Initializable {
     }
 
     public boolean updateCustomerInfo() throws SQLException {
-        int indexOfCustomerToModify = JDBCEntries.getAllCustomers().indexOf(customerToModify);
+        int indexOfCustomerToModify = ScheduleEntries.getAllCustomers().indexOf(customerToModify);
         customerToModify.setName(txtName.getText());
         customerToModify.getCountry().setCountry(txtCountry.getText());
         customerToModify.getAddress().setAddress(txtAddress.getText());
@@ -271,7 +271,7 @@ public class AddCust implements Initializable {
         if (resultSet == 0)
             return false;
 
-        JDBCEntries.updateCustomer(indexOfCustomerToModify, customerToModify);
+        ScheduleEntries.updateCustomer(indexOfCustomerToModify, customerToModify);
         return true;
     }
 

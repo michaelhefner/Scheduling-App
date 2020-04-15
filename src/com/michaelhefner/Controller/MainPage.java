@@ -110,7 +110,7 @@ public class MainPage implements Initializable {
         clmAppStartDate.setCellValueFactory(new PropertyValueFactory<>("start"));
         clmAppEndDate.setCellValueFactory(new PropertyValueFactory<>("end"));
 
-        appointmentFilteredList = new FilteredList<>(JDBCEntries.getAllAppointments(), appointment -> true);
+        appointmentFilteredList = new FilteredList<>(ScheduleEntries.getAllAppointments(), appointment -> true);
         tblAppointments.setItems(appointmentFilteredList);
         tblAppointments.getSelectionModel().selectedItemProperty()
                 .addListener((observableValue, appointment, t1) -> appointmentToBeModified = t1);
@@ -120,7 +120,7 @@ public class MainPage implements Initializable {
         clmCustCity.setCellValueFactory(new PropertyValueFactory<>("city"));
         clmCustCountry.setCellValueFactory(new PropertyValueFactory<>("country"));
 
-        customerFilteredList = new FilteredList<>(JDBCEntries.getAllCustomers(), customer -> true);
+        customerFilteredList = new FilteredList<>(ScheduleEntries.getAllCustomers(), customer -> true);
         tblCustomer.setItems(customerFilteredList);
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerIdToBeModified = t1);
@@ -132,7 +132,7 @@ public class MainPage implements Initializable {
         durationList.add("Week");
         durationList.add("Month");
         cbDurationFilter.setItems(durationList);
-        SortedList<Appointment> sortedList = new SortedList<>(JDBCEntries.getAllAppointments(),
+        SortedList<Appointment> sortedList = new SortedList<>(ScheduleEntries.getAllAppointments(),
                 (Appointment appointment, Appointment appointment2) -> {
                     if (appointment.getStart().isBefore(appointment2.getStart()))
                         return -1;
@@ -154,7 +154,7 @@ public class MainPage implements Initializable {
                 }));
 
         customerList.add(null);
-        for (Customer customer : JDBCEntries.getAllCustomers())
+        for (Customer customer : ScheduleEntries.getAllCustomers())
             customerList.add(customer.getName());
         cbContactFilter.setItems(customerList);
 
@@ -263,7 +263,7 @@ public class MainPage implements Initializable {
                 countryMap.put(1, customerIdToBeModified.getCountry().getId());
                 Query.executeUpdate("DELETE FROM country WHERE countryId =?", countryMap);
 
-                JDBCEntries.deleteCustomer(customerIdToBeModified);
+                ScheduleEntries.deleteCustomer(customerIdToBeModified);
                 Connect.closeConnection();
             }
         }
@@ -283,7 +283,7 @@ public class MainPage implements Initializable {
                 appointmentMap.put(1, appointmentToBeModified.getId());
                 int updateCount = Query.executeUpdate("DELETE FROM appointment WHERE appointmentId =?", appointmentMap);
                 System.out.println("DB update count: " + updateCount);
-                JDBCEntries.deleteAppointment(appointmentToBeModified);
+                ScheduleEntries.deleteAppointment(appointmentToBeModified);
                 Connect.closeConnection();
             }
         }
@@ -317,7 +317,7 @@ public class MainPage implements Initializable {
     }
 
     private void populateTimeline() {
-        for (Appointment appointment : JDBCEntries.getAllAppointments())
+        for (Appointment appointment : ScheduleEntries.getAllAppointments())
             Timeline.addTimeSlot(
                     new TimeSlot(appointment.getStart(), appointment.getEnd()));
     }
@@ -370,7 +370,7 @@ public class MainPage implements Initializable {
             c.setAddress(address);
             c.setCity(city);
 
-            JDBCEntries.addCustomer(c);
+            ScheduleEntries.addCustomer(c);
         }
         Connect.closeConnection();
     }
@@ -390,7 +390,7 @@ public class MainPage implements Initializable {
                     appointmentResultSet.getTimestamp("start").toLocalDateTime(),
                     appointmentResultSet.getTimestamp("end").toLocalDateTime());
             appointment.setId(appointmentResultSet.getInt("appointmentId"));
-            JDBCEntries.addAppointment(appointment);
+            ScheduleEntries.addAppointment(appointment);
             checkAppTimeEminent(appointment.getStart(), appointment.getTitle());
         }
         Connect.closeConnection();

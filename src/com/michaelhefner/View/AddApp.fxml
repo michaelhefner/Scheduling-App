@@ -21,7 +21,7 @@
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="10.0"/>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="10.0"/>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="10.0"/>
-                <ColumnConstraints/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="10.0"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="5.0" prefHeight="35.0" vgrow="SOMETIMES"/>
@@ -45,7 +45,7 @@
                     </font>
                 </Label>
                 <TextField fx:id="txtTitle" promptText="Appointment Title" GridPane.columnIndex="1"
-                           GridPane.columnSpan="3" GridPane.rowIndex="0">
+                           GridPane.columnSpan="4" GridPane.rowIndex="0">
                     <font>
                         <Font size="14.0"/>
                     </font>
@@ -56,8 +56,8 @@
                         <Font size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="txtDescription" promptText="Description" GridPane.columnIndex="1"
-                           GridPane.columnSpan="3" GridPane.rowIndex="1">
+                <TextField fx:id="txtDescription" prefWidth="245.0" promptText="Description" GridPane.columnIndex="1"
+                           GridPane.columnSpan="4" GridPane.rowIndex="1">
                     <font>
                         <Font size="14.0"/>
                     </font>
@@ -67,7 +67,7 @@
                         <Font size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="txtLocation" promptText="Location" GridPane.columnIndex="1" GridPane.columnSpan="3"
+                <TextField fx:id="txtLocation" promptText="Location" GridPane.columnIndex="1" GridPane.columnSpan="4"
                            GridPane.rowIndex="2">
                     <font>
                         <Font size="14.0"/>
@@ -83,7 +83,7 @@
                         <Font size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="txtType" promptText="Type" GridPane.columnIndex="1" GridPane.columnSpan="3"
+                <TextField fx:id="txtType" promptText="Type" GridPane.columnIndex="1" GridPane.columnSpan="4"
                            GridPane.rowIndex="4">
                     <font>
                         <Font size="14.0"/>
@@ -94,7 +94,7 @@
                         <Font size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="txtUrl" promptText="Url" GridPane.columnIndex="1" GridPane.columnSpan="3"
+                <TextField fx:id="txtUrl" promptText="Url" GridPane.columnIndex="1" GridPane.columnSpan="4"
                            GridPane.rowIndex="5">
                     <font>
                         <Font size="14.0"/>
@@ -106,7 +106,7 @@
                     </font>
                 </Label>
                 <DatePicker fx:id="dpStart" promptText="Appointment Start" GridPane.columnIndex="1"
-                            GridPane.columnSpan="3" GridPane.rowIndex="6"/>
+                            GridPane.columnSpan="4" GridPane.rowIndex="6"/>
                 <Label prefHeight="17.0" text="End" GridPane.columnIndex="0" GridPane.rowIndex="9">
                     <font>
                         <Font size="14.0"/>

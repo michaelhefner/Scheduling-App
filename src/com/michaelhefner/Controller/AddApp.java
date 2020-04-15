@@ -4,7 +4,7 @@ import com.michaelhefner.Model.Appointment;
 import com.michaelhefner.Model.Customer;
 import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
-import com.michaelhefner.Model.JDBCEntries;
+import com.michaelhefner.Model.ScheduleEntries;
 import com.michaelhefner.Model.Time.TimeSlot;
 import com.michaelhefner.Model.Time.Timeline;
 import com.michaelhefner.Model.User;
@@ -211,7 +211,7 @@ public class AddApp implements Initializable {
                 showAlert("Failed", "Appointment failed to save in database.",
                         "Select 'OK' to retry");
             } else {
-                JDBCEntries.addAppointment(appointment);
+                ScheduleEntries.addAppointment(appointment);
                 closeWindow();
             }
             Connect.closeConnection();
@@ -219,7 +219,7 @@ public class AddApp implements Initializable {
     }
 
     public boolean updateAppointment() throws SQLException {
-        int indexOfAppointment = JDBCEntries.getAllAppointments().indexOf(appointmentToModify);
+        int indexOfAppointment = ScheduleEntries.getAllAppointments().indexOf(appointmentToModify);
 
         appointmentToModify.setTitle(txtTitle.getText());
         appointmentToModify.setType(txtType.getText());
@@ -251,7 +251,7 @@ public class AddApp implements Initializable {
         if (resultSet == 0)
             return false;
 
-        JDBCEntries.updateAppointment(indexOfAppointment, appointmentToModify);
+        ScheduleEntries.updateAppointment(indexOfAppointment, appointmentToModify);
         return true;
     }
 
@@ -275,7 +275,7 @@ public class AddApp implements Initializable {
         cbStartMin.setValue(Integer.toString(appointment.getStart().getMinute()));
         cbEndHour.setValue(getHour2DigitFormat(appointment.getEnd().getHour()));
         cbEndMin.setValue(Integer.toString(appointment.getStart().getMinute()));
-        customerToAddToAppointment = JDBCEntries.getAllCustomers().filtered(customer ->
+        customerToAddToAppointment = ScheduleEntries.getAllCustomers().filtered(customer ->
                 customer.getName().toLowerCase().equals(appointment.getContact().toLowerCase())).get(0);
         isModifyAppointment = true;
         appointmentToModify = appointment;
@@ -407,7 +407,7 @@ public class AddApp implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         tblCustomer.setVisibleRowCount(5);
-        tblCustomer.setItems(JDBCEntries.getAllCustomers());
+        tblCustomer.setItems(ScheduleEntries.getAllCustomers());
         tblCustomer.setPromptText("Please select a contact...");
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerToAddToAppointment = t1);

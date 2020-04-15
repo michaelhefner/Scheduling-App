@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -32,9 +33,10 @@ public class Login implements Initializable {
     private Label lblError;
     @FXML
     private PasswordField txtPassword;
-
     @FXML
     private TextField txtUsername;
+    @FXML
+    private Button btnLogin;
 
     private void addMessage(String message) {
         writeBuilder.append(" message=").append(message).append(" ");
@@ -148,5 +150,6 @@ public class Login implements Initializable {
             correctAuth = resourceBundle.getString("CORRECT_AUTH");
             incorrectAuth = resourceBundle.getString("INCORRECT_AUTH");
         }
+        btnLogin.setDefaultButton(true);
     }
 }

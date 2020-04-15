@@ -4,14 +4,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Timeline {
-    private static ObservableList<TimeSlot> dateTimeObservableList = FXCollections.observableArrayList();
+    private static final ObservableList<TimeSlot> dateTimeObservableList = FXCollections.observableArrayList();
 
     public static ObservableList<TimeSlot> getDateTimeObservableList() {
         return dateTimeObservableList;
     }
 
     public static void removeTimeSlot(TimeSlot timeSlot) {
-
         dateTimeObservableList.remove(timeSlot);
     }
 
@@ -27,7 +26,7 @@ public class Timeline {
     }
 
     public static boolean addTimeSlot(TimeSlot timeSlotToAdd) {
-        boolean isOk = true;
+        boolean isOk;
 
         isOk = lookupTimeSlot(timeSlotToAdd);
 
