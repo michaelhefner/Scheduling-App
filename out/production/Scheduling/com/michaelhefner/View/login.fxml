@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <AnchorPane prefHeight="232.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.michaelhefner.Controller.Login">
     <children>
       <Label fx:id="lblError" alignment="CENTER" contentDisplay="CENTER" layoutX="178.0" layoutY="14.0" prefHeight="17.0" prefWidth="245.0" textAlignment="CENTER" textFill="#d51515" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
@@ -48,9 +47,11 @@
                 </HBox>
             </children>
         </VBox>
-      <Button alignment="BOTTOM_RIGHT" layoutX="395.0" layoutY="188.0" mnemonicParsing="false" onAction="#onLoginClicked" text="Login" textAlignment="RIGHT">
-         <font>
-            <Font size="14.0" />
-         </font></Button>
+      <Button fx:id="btnLogin" alignment="BOTTOM_RIGHT" layoutX="395.0" layoutY="188.0" mnemonicParsing="false"
+              onAction="#onLoginClicked" text="Login" textAlignment="RIGHT">
+          <font>
+              <Font size="14.0"/>
+          </font>
+      </Button>
     </children>
 </AnchorPane>
