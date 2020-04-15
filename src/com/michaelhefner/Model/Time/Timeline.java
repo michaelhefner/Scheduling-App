@@ -1,8 +1,7 @@
-package com.michaelhefner.Model;
+package com.michaelhefner.Model.Time;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 
 public class Timeline {
     private static ObservableList<TimeSlot> dateTimeObservableList = FXCollections.observableArrayList();
@@ -12,19 +11,25 @@ public class Timeline {
     }
 
     public static void removeTimeSlot(TimeSlot timeSlot) {
+
         dateTimeObservableList.remove(timeSlot);
+    }
+
+    public static boolean lookupTimeSlot(TimeSlot timeSlotToLookup) {
+        for (TimeSlot timeSlot : dateTimeObservableList) {
+            if (!((timeSlotToLookup.getStart().isBefore(timeSlot.getStart())
+                    && timeSlotToLookup.getEnd().isBefore(timeSlot.getStart()))
+                    || (timeSlotToLookup.getStart().isAfter(timeSlot.getEnd())))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean addTimeSlot(TimeSlot timeSlotToAdd) {
         boolean isOk = true;
 
-        for (TimeSlot timeSlot : dateTimeObservableList) {
-            if (!((timeSlotToAdd.getStart().isBefore(timeSlot.getStart())
-                    && timeSlotToAdd.getEnd().isBefore(timeSlot.getStart()))
-                    || (timeSlotToAdd.getStart().isAfter(timeSlot.getEnd())))) {
-                isOk = false;
-            }
-        }
+        isOk = lookupTimeSlot(timeSlotToAdd);
 
         if (timeSlotToAdd.getStart().isAfter(timeSlotToAdd.getEnd()))
             isOk = false;
@@ -32,4 +37,5 @@ public class Timeline {
             dateTimeObservableList.add(timeSlotToAdd);
         return isOk;
     }
+
 }

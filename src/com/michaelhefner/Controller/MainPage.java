@@ -3,7 +3,12 @@ package com.michaelhefner.Controller;
 import com.michaelhefner.Model.*;
 import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
+import com.michaelhefner.Model.Time.Day;
+import com.michaelhefner.Model.Time.TimeSlot;
+import com.michaelhefner.Model.Time.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -58,16 +64,43 @@ public class MainPage implements Initializable {
     @FXML
     private TableColumn<Appointment, String> clmAppEndDate;
     @FXML
-    private Label timeLabel;
-    @FXML
     private Label messageLabel;
+    //
+//    @FXML
+//    private TableView<Day> tblCalendarMonth;
+//    @FXML
+//    private TableColumn<Day, String> clmDayOfMonth;
+//    @FXML
+//    private TableColumn<Day, String> clmMonday;
+//    @FXML
+//    private TableColumn<Day, String> clmTuesday;
+//    @FXML
+//    private TableColumn<Day, String> clmWednesday;
+//    @FXML
+//    private TableColumn<Day, String> clmThursday;
+//    @FXML
+//    private TableColumn<Day, String> clmFriday;
+//    @FXML
+//    private TableColumn<Day, String> clmSaturday;
+    @FXML
+    private TableView<Appointment> tblCalendarMonth;
+    @FXML
+    private TableColumn<Appointment, String> clmDayOfMonth;
+    @FXML
+    private TableColumn<Appointment, String> clmMonday;
+    @FXML
+    private TableColumn<Appointment, String> clmTuesday;
+    @FXML
+    private TableColumn<Appointment, String> clmWednesday;
+    @FXML
+    private TableColumn<Appointment, String> clmThursday;
+    @FXML
+    private TableColumn<Appointment, String> clmFriday;
+    @FXML
+    private TableColumn<Appointment, String> clmSaturday;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        timeLabel.setText(((LocalDateTime.now().getHour() > 12) ? LocalDateTime.now().getHour() - 12
-                : LocalDateTime.now().getHour()) + ":" +
-                ((LocalDateTime.now().getMinute() < 10) ? "0" + LocalDateTime.now().getMinute()
-                        : LocalDateTime.now().getMinute()) + ((LocalDateTime.now().getHour() > 11) ? " PM" : " AM"));
         try {
             populateCustomerDataFromDB();
             populateAppointmentDataFromDB();
@@ -96,12 +129,27 @@ public class MainPage implements Initializable {
         tblCustomer.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, customer, t1) -> customerIdToBeModified = t1);
 
-    }
+        ObservableList<Appointment> thisMonthsAppointments = JDBCEntries.getAllAppointments().filtered(appointment -> {
+            return appointment.getStart().getMonth().equals(LocalDate.now().getMonth());
+        });
 
-    private void populateTimeline() {
-        for (Appointment appointment : JDBCEntries.getAllAppointments())
-            System.out.println(Timeline.addTimeSlot(
-                    new TimeSlot(appointment.getStart(), appointment.getEnd())));
+        ObservableList<Day> days = FXCollections.observableArrayList();
+
+        LocalDate localDate = LocalDate.now();
+        for (int i = 0; i <= localDate.lengthOfMonth() - localDate.getDayOfMonth(); i++) {
+
+            days.add(new Day(localDate.plusDays(i).getDayOfWeek().toString(), localDate.plusDays(i).getDayOfMonth()));
+        }
+
+        clmDayOfMonth.setCellValueFactory(new PropertyValueFactory<>("id"));
+        clmMonday.setCellValueFactory(new PropertyValueFactory<>("title"));
+        clmTuesday.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        clmWednesday.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+        clmThursday.setCellValueFactory(new PropertyValueFactory<>("endDate"));
+        clmFriday.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+        clmSaturday.setCellValueFactory(new PropertyValueFactory<>("contact"));
+//        ObservableList<Day> days = FXCollections.observableArrayList();
+        tblCalendarMonth.setItems(thisMonthsAppointments);
     }
 
     @FXML
@@ -117,26 +165,6 @@ public class MainPage implements Initializable {
                 System.exit(0);
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-        }
-    }   //complete
-
-    @FXML
-    public void deleteApp() throws SQLException {
-        if (appointmentToBeModified != null) {
-            alert.setTitle("Delete");
-            alert.setHeaderText("You are about to delete " + appointmentToBeModified.getTitle());
-            alert.setContentText("Are you sure you would like to proceed?");
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-
-                Map<Integer, Object> appointmentMap = new HashMap<>();
-                appointmentMap.put(1, appointmentToBeModified.getId());
-                int updateCount = Query.executeUpdate("DELETE FROM appointment WHERE appointmentId =?", appointmentMap);
-                System.out.println("DB update count: " + updateCount);
-                JDBCEntries.deleteAppointment(appointmentToBeModified);
-                Connect.closeConnection();
             }
         }
     }   //complete
@@ -161,6 +189,19 @@ public class MainPage implements Initializable {
     @FXML
     public void openAddApp() {
         openStage("../View/AddApp.fxml", null);
+    }   //complete
+
+    @FXML
+    public void openModifyCust() throws IOException {
+        if (customerIdToBeModified != null) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("../View/AddCust.fxml"));
+            AnchorPane root = loader.load();
+            AddCust addCust = loader.getController();
+            addCust.isModify(customerIdToBeModified);
+            openStage(null, root);
+        }
+
     }   //complete
 
     @FXML
@@ -196,16 +237,23 @@ public class MainPage implements Initializable {
     }   //complete
 
     @FXML
-    public void openModifyCust() throws IOException {
-        if (customerIdToBeModified != null) {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("../View/AddCust.fxml"));
-            AnchorPane root = loader.load();
-            AddCust addCust = loader.getController();
-            addCust.isModify(customerIdToBeModified);
-            openStage(null, root);
-        }
+    public void deleteApp() throws SQLException {
+        if (appointmentToBeModified != null) {
+            alert.setTitle("Delete");
+            alert.setHeaderText("You are about to delete " + appointmentToBeModified.getTitle());
+            alert.setContentText("Are you sure you would like to proceed?");
 
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+
+                Map<Integer, Object> appointmentMap = new HashMap<>();
+                appointmentMap.put(1, appointmentToBeModified.getId());
+                int updateCount = Query.executeUpdate("DELETE FROM appointment WHERE appointmentId =?", appointmentMap);
+                System.out.println("DB update count: " + updateCount);
+                JDBCEntries.deleteAppointment(appointmentToBeModified);
+                Connect.closeConnection();
+            }
+        }
     }   //complete
 
     @FXML
@@ -234,6 +282,12 @@ public class MainPage implements Initializable {
                     .equals(txtSearchApp.getText().toLowerCase()));
         });
     }   //complete
+
+    private void populateTimeline() {
+        for (Appointment appointment : JDBCEntries.getAllAppointments())
+            Timeline.addTimeSlot(
+                    new TimeSlot(appointment.getStart(), appointment.getEnd()));
+    }
 
     private void populateCustomerDataFromDB() throws SQLException {
         ArrayList<Customer> customers = new ArrayList<>();
@@ -304,12 +358,12 @@ public class MainPage implements Initializable {
                     appointmentResultSet.getTimestamp("end").toLocalDateTime());
             appointment.setId(appointmentResultSet.getInt("appointmentId"));
             JDBCEntries.addAppointment(appointment);
-            checkAppTimeImenant(appointment.getStart(), appointment.getTitle());
+            checkAppTimeEminent(appointment.getStart(), appointment.getTitle());
         }
         Connect.closeConnection();
     }   //complete
 
-    private void checkAppTimeImenant(LocalDateTime start, String title) {
+    private void checkAppTimeEminent(LocalDateTime start, String title) {
         if (LocalDateTime.now().isBefore(start) && LocalDateTime.now().plusMinutes(15).isAfter(start)) {
             showAlert("Upcoming appointment",
                     "You have an upcoming event in " +

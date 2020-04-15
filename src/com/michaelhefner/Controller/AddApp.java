@@ -1,8 +1,13 @@
 package com.michaelhefner.Controller;
 
-import com.michaelhefner.Model.*;
+import com.michaelhefner.Model.Appointment;
+import com.michaelhefner.Model.Customer;
 import com.michaelhefner.Model.DB.Connect;
 import com.michaelhefner.Model.DB.Query;
+import com.michaelhefner.Model.JDBCEntries;
+import com.michaelhefner.Model.Time.TimeSlot;
+import com.michaelhefner.Model.Time.Timeline;
+import com.michaelhefner.Model.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -41,6 +46,10 @@ public class AddApp implements Initializable {
     @FXML
     private ComboBox<String> cbStart;
     @FXML
+    private TextField txtStartTime;
+    @FXML
+    private TextField txtEndTime;
+    @FXML
     private Button btnCancel;
     @FXML
     private Text txtHeading;
@@ -60,10 +69,6 @@ public class AddApp implements Initializable {
     private DatePicker dpEnd;
     @FXML
     private ComboBox<Customer> tblCustomer;
-//    @FXML
-//    private TableColumn<Customer, String> clmCustID;
-//    @FXML
-//    private TableColumn<Customer, String> clmCustName;
 
     private final String NO_ERROR = "-fx-border-color: rgba(25, 205, 25, 1);";
 
@@ -76,19 +81,6 @@ public class AddApp implements Initializable {
     private LocalDateTime startAppointmentDateTime;
     private LocalDateTime endAppointmentDateTime;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
-
-        tblCustomer.setVisibleRowCount(5);
-        tblCustomer.setItems(JDBCEntries.getAllCustomers());
-        tblCustomer.setPromptText("Please select a contact...");
-        tblCustomer.getSelectionModel().selectedItemProperty().addListener(
-                (observableValue, customer, t1) -> customerToAddToAppointment = t1);
-
-        prepareDateTimeSelectors();
-
-    }
 
     private boolean setStartAndEndDateTimeAndValidate() {
         int startHourConverted;
@@ -133,6 +125,7 @@ public class AddApp implements Initializable {
         }
     }
 
+
     private boolean validateDate() {
         if (dpStart.getValue() != null && dpEnd.getValue() != null) {
             if (isStartBeforeEndTime(startAppointmentDateTime, endAppointmentDateTime)) {
@@ -162,8 +155,7 @@ public class AddApp implements Initializable {
 
         if (!Timeline.addTimeSlot(
                 new TimeSlot(startAppointmentDateTime, endAppointmentDateTime))) {
-            //noinspection PointlessBooleanExpression
-            isValid &= false;
+            isValid = false;
             showAlert("Error", "Appointment time taken", "Select 'OK' to change");
         }
 
@@ -268,15 +260,21 @@ public class AddApp implements Initializable {
     }
 
     public void isModify(Appointment appointment) {
-        Timeline.removeTimeSlot(new TimeSlot(appointment.getStart(), appointment.getEnd()));
+        TimeSlot tempSlot = Timeline.getDateTimeObservableList().filtered(timeSlot ->
+                timeSlot.getStart().isEqual(appointment.getStart())).get(0);
+
+        Timeline.removeTimeSlot(tempSlot);
+
         txtHeading.setText("Modify Appointment");
         txtUrl.setText(appointment.getUrl());
         txtType.setText(appointment.getType());
         txtTitle.setText(appointment.getTitle());
         txtLocation.setText(appointment.getLocation());
         txtDescription.setText(appointment.getDescription());
+
         dpStart.setValue(appointment.getStart().toLocalDate());
         dpEnd.setValue(appointment.getEnd().toLocalDate());
+
         cbStartHour.setValue(getHour2DigitFormat(appointment.getStart().getHour()));
         cbStartMin.setValue(Integer.toString(appointment.getStart().getMinute()));
         cbEndHour.setValue(getHour2DigitFormat(appointment.getEnd().getHour()));
@@ -285,6 +283,7 @@ public class AddApp implements Initializable {
                 customer.getName().toLowerCase().equals(appointment.getContact().toLowerCase())).get(0);
         isModifyAppointment = true;
         appointmentToModify = appointment;
+        setAMPMFormat(appointment.getStart(), appointment.getEnd());
     }
 
     @FXML
@@ -316,8 +315,28 @@ public class AddApp implements Initializable {
             return "0" + hour;
         else if (hour < 13)
             return Integer.toString(hour);
+        else if (hour < 22)
+            return "0" + (hour - 12);
         else
             return Integer.toString(hour - 12);
+    }
+
+    private String getMin2DigitFormat(int min) {
+        if (min < 10)
+            return "0" + min;
+        else
+            return Integer.toString(min);
+    }
+
+    private void setAMPMFormat(LocalDateTime start, LocalDateTime end) {
+        if (start.getHour() > 11)
+            cbStart.setValue("PM");
+        else
+            cbStart.setValue("AM");
+        if (end.getHour() > 11)
+            cbEnd.setValue("PM");
+        else
+            cbEnd.setValue("AM");
     }
 
     private void prepareDateTimeSelectors() {
@@ -344,23 +363,16 @@ public class AddApp implements Initializable {
         cbStartMin.setItems(startMin);
         cbEndHour.setItems(endHour);
         cbEndMin.setItems(endMin);
-        cbStartMin.setValue(Integer.toString(localDateTime.getMinute()));
-        cbEndMin.setValue(Integer.toString(localDateTime.getMinute()));
+        cbStartMin.setValue(getMin2DigitFormat(localDateTime.getMinute()));
+        cbEndMin.setValue(getMin2DigitFormat(localDateTime.getMinute()));
 
         cbStartHour.setValue(getHour2DigitFormat(localDateTime.getHour()));
-        cbEndHour.setValue(getHour2DigitFormat(localDateTime.getHour() + 1));
-        if (localDateTime.getHour() > 11) {
-            cbStart.setValue("PM");
-            cbEnd.setValue("PM");
-        } else {
-            cbStart.setValue("AM");
-            cbEnd.setValue((localDateTime.getHour() + 1 > 11) ? "PM" : "AM");
-        }
+        cbEndHour.setValue(getHour2DigitFormat(localDateTime.plusHours(1).getHour()));
+
+        setAMPMFormat(LocalDateTime.now(), LocalDateTime.now().plusMinutes(60));
     }
 
-    private boolean checkForEmptyField(TextField[] textFields,
-                                       DatePicker[] datePicker,
-                                       Customer customer) {
+    private boolean checkForEmptyField(TextField[] textFields, DatePicker[] datePicker, Customer customer) {
         boolean isValid = true;
 
         for (TextField field : textFields) {
@@ -395,4 +407,16 @@ public class AddApp implements Initializable {
         return (end.isAfter(start));
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        tblCustomer.setVisibleRowCount(5);
+        tblCustomer.setItems(JDBCEntries.getAllCustomers());
+        tblCustomer.setPromptText("Please select a contact...");
+        tblCustomer.getSelectionModel().selectedItemProperty().addListener(
+                (observableValue, customer, t1) -> customerToAddToAppointment = t1);
+
+        if (!isModifyAppointment) prepareDateTimeSelectors();
+
+    }
 }

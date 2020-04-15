@@ -1,6 +1,8 @@
 package com.michaelhefner.Model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class Appointment {
     private int id;
@@ -14,7 +16,10 @@ public class Appointment {
     private String url;
     private LocalDateTime start;
     private LocalDateTime end;
-
+    private LocalDate startDate;
+    private LocalTime startTime;
+    private LocalDate endDate;
+    private LocalTime endTime;
 
     public Appointment(int customerId, String userId, String title, String description, String location, String contact,
                        String type, String url, LocalDateTime start, LocalDateTime end) {
@@ -28,7 +33,44 @@ public class Appointment {
         setUrl(url);
         setStart(start);
         setEnd(end);
+        setStartDate(start.toLocalDate());
+        setStartTime(start.toLocalTime());
+        setEndDate(start.toLocalDate());
+        setEndTime(start.toLocalTime());
     }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
 
     public int getId() {
         return id;

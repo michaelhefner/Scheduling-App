@@ -1,4 +1,4 @@
-package com.michaelhefner.Model;
+package com.michaelhefner.Model.Time;
 
 import java.time.LocalDateTime;
 
